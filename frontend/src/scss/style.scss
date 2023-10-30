@@ -1,0 +1,24 @@
+.anim-show {
+	opacity: 0;
+	transition: 1s;
+	animation: show 1s 1;
+  animation-fill-mode: forwards;
+}
+
+.btn > svg {
+  vertical-align: -.125em;
+  margin-right: 0.2em;
+}
+
+.mt-12 {
+  margin-top: 12%;
+}
+
+.mb-3-5 {
+  margin-bottom: 2.2em !important;
+}
+
+@keyframes show {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+ }

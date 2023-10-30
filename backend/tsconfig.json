@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "moduleResolution": "Node",
+    "outDir": "dist",
+    "baseUrl": ".",
+    "target": "ESNext",
+    "module": "ESNext"
+  }
+}
