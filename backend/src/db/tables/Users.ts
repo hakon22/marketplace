@@ -1,7 +1,8 @@
 import { DataTypes, Model, InferAttributes, InferCreationAttributes, CreationOptional } from 'sequelize';
+import { Request } from 'express';
 import { db } from '../connect.js';
 
-export interface UserModel extends Model<InferAttributes<UserModel>, InferCreationAttributes<UserModel>> {
+interface UserModel extends Model<InferAttributes<UserModel>, InferCreationAttributes<UserModel>> {
   id?: CreationOptional<number>;
   username: string;
   password: string;
@@ -11,6 +12,15 @@ export interface UserModel extends Model<InferAttributes<UserModel>, InferCreati
   code_activation: number;
   createdAt?: string;
   updatedAt?: string;
+}
+
+export interface PassportRequest extends Request {
+  user: {
+    dataValues: UserModel & {
+      token: string;
+      refreshToken: string;
+    }
+  }
 }
 
 const Users = db.define<UserModel>(

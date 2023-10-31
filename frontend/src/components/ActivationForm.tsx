@@ -73,9 +73,8 @@ const ActivationForm = ({ id }: { id: string | undefined }) => {
   });
 
   useEffect(() => {
-    if (timer !== Number('00')) {
-      const decrementValue = timer < 11 ? Number(`0${timer - 1}`) : timer - 1;
-      const timerAlive = setTimeout(setTimer, 1000, decrementValue);
+    if (timer) {
+      const timerAlive = setTimeout(setTimer, 1000, timer - 1);
       return () => clearTimeout(timerAlive);
     }
     return undefined;
@@ -109,7 +108,7 @@ const ActivationForm = ({ id }: { id: string | undefined }) => {
           size="sm"
           variant="warning"
           className="mt-1 mb-1"
-          title={email}
+          title={email ?? ''}
         >
           <Dropdown.Item eventKey="1" onClick={modalShow}>{t('activationForm.dropMenuChange')}</Dropdown.Item>
         </DropdownButton>
@@ -133,8 +132,8 @@ const ActivationForm = ({ id }: { id: string | undefined }) => {
             {t(formik.errors.code)}
           </Form.Control.Feedback>
         </FloatingLabel>
-        { timer !== Number('00')
-          ? (<p className="text-muted mb-3-5">{`${t('activationForm.timerText')}${timer}`}</p>)
+        { timer
+          ? (<p className="text-muted mb-3-5">{`${timer < 10 ? t('activationForm.timerTextZero') : t('activationForm.timerText')}${timer}`}</p>)
           : (
             <Button onClick={repeatEmail} variant="warning" className="d-block mx-auto mb-3-5 anim-show" size="sm" disabled={formik.isSubmitting}>
               <EnvelopeAt />

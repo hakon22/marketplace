@@ -1,8 +1,5 @@
 import axios from 'axios';
-import {
-  createSlice, createEntityAdapter, createAsyncThunk, PayloadAction,
-} from '@reduxjs/toolkit';
-import type { RootState } from './index';
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import type { User } from '../types/User';
 import type { InitialStateType } from '../types/InitialState';
 import routes from '../routes';
@@ -57,8 +54,6 @@ export const updateTokens = createAsyncThunk(
   },
 );
 
-export const loginAdapter = createEntityAdapter<User>();
-
 export const initialState: InitialStateType = {
   loadingStatus: 'idle',
   error: null,
@@ -68,7 +63,7 @@ export const fetchFulfilled = fetchLogin.fulfilled;
 
 const loginSlice = createSlice({
   name: 'login',
-  initialState: loginAdapter.getInitialState(initialState),
+  initialState,
   reducers: {
     removeToken: (state) => {
       const entries = Object.keys(state);
@@ -116,7 +111,7 @@ const loginSlice = createSlice({
         : PayloadAction<{ code: number, user: User }>) => {
         if (payload.code === 1) {
           if (window.localStorage.getItem('refresh_token')) {
-            window.localStorage.setItem('refresh_token', payload.user.refresh_token);
+            window.localStorage.setItem('refresh_token', payload.user.refreshToken);
           }
           const entries = Object.entries(payload.user);
           entries.forEach(([key, value]) => { state[key] = value; });
@@ -164,7 +159,5 @@ const loginSlice = createSlice({
 });
 
 export const { removeToken, addTokenStorage, changeEmailActivation } = loginSlice.actions;
-
-export const selectors = loginAdapter.getSelectors<RootState>((state) => state.login);
 
 export default loginSlice.reducer;

@@ -3,7 +3,8 @@ export type User = {
   username: string;
   email: string;
   phone: string;
-  refresh_token: string;
+  token: string;
+  refreshToken: string;
 }
 
 export type PropsUser = {

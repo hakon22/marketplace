@@ -39,6 +39,7 @@ export default {
       submit: 'Активировать аккаунт',
       timerButton: 'Отправить повторно',
       timerText: 'Отправить повторно: 00:',
+      timerTextZero: 'Отправить повторно: 00:0',
       toYourMail: 'На вашу почту',
       postConfirmCode: 'был выслан код подтверждения',
       dropMenuChange: 'Изменить',

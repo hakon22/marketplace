@@ -13,15 +13,15 @@ const Activation = () => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const { id } = useParams();
-  const [continueActivation, setContinueActivation] = useState(true);
+  const [continueActivation, setContinueActivation] = useState(false);
   const { loadingStatus } = useAppSelector((state) => state.login);
 
   useEffect(() => {
     if (id) {
       const needsActivation = async () => {
         const { payload } = await dispatch(fetchActivation(id));
-        if (!payload) {
-          setContinueActivation(false);
+        if (payload) {
+          setContinueActivation(true);
         }
       };
       needsActivation();

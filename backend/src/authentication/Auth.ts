@@ -1,27 +1,29 @@
 import bcrypt from 'bcryptjs';
+import { Op } from 'sequelize';
 import { Request, Response } from 'express';
 import passGen from 'generate-password';
 import { codeGen } from '../activation/Activation.js';
-import Users, { UserModel } from '../db/tables/Users.js';
+import Users, { PassportRequest } from '../db/tables/Users.js';
 import { sendMailActivationAccount, sendMailRecoveryPass } from '../mail/sendMail.js';
 import { generateAccessToken, generateRefreshToken } from '../authentication/tokensGen.js';
-
-interface PassportRequest extends Request {
-  user: {
-    dataValues: UserModel & {
-    token: string;
-    refreshToken: string;}
-  }
-}
 
 class Auth {
 
   async signup(req: Request, res: Response) {
     try {
       const { username, phone, password, email } = req.body;
-      const candidate = await Users.findOne({ where: { email } });
-      if (candidate) {
-        return res.json({ code: 2 });
+      const candidates = await Users.findAll({ where: { [Op.or]: [{ email }, { phone }] } });
+      if (candidates.length > 0) {
+        const errorsFields = candidates.reduce((acc: ('email' | 'phone')[], candidate) => {
+          if (candidate.email === email) {
+            acc.push('email');
+          }
+          if (candidate.phone === phone) {
+            acc.push('phone');
+          }
+          return acc;
+        }, []);
+        return res.json({ code: 2, errorsFields });
       }
       const hashPassword = bcrypt.hashSync(password, 10);
       const code_activation = codeGen();
@@ -49,14 +51,14 @@ class Auth {
       const { phone, password } = req.body;
       const user = await Users.findOne({ where: { phone } });
       if (!user) {
-        return res.json({ code: 1 });
+        return res.json({ code: 4 });
       }
       const isValidPassword = bcrypt.compareSync(password, user.password);
       if (!isValidPassword) {
-        return res.json({ code: 2 });
+        return res.json({ code: 3 });
       }
       if (user.code_activation) {
-        return res.json({ code: 3 });
+        return res.json({ code: 2 });
       }
       const token = generateAccessToken(user.id, user.email);
       const refreshToken = generateRefreshToken(user.id, user.email);
@@ -69,7 +71,7 @@ class Auth {
       } else {
         await Users.update({ refresh_token: [refreshToken] }, { where: { email } });
       }
-      res.status(200).send({ user: { token, refreshToken, username, id, email, phone } });
+      res.status(200).send({ code: 1, user: { token, refreshToken, username, id, email, phone } });
     } catch (e) {
       console.log(e);
       res.sendStatus(500);
@@ -81,6 +83,7 @@ class Auth {
       const { dataValues: { id, username, refresh_token, email, phone, token, refreshToken } } = req.user;
       const oldRefreshToken = req.get('Authorization').split(' ')[1];
       const availabilityRefresh = refresh_token.find((token: string) => token === oldRefreshToken);
+      console.log(token);
       if (availabilityRefresh) {
         const newRefreshTokens = refresh_token.filter((token: string) => token !== oldRefreshToken);
         newRefreshTokens.push(refreshToken);
@@ -88,7 +91,7 @@ class Auth {
       } else {
         throw new Error('Ошибка доступа');
       } 
-      res.status(200).send({ id, username, token, refreshToken, email, phone });
+      res.status(200).send({ code: 1, user: { id, username, token, refreshToken, email, phone } });
     } catch (e) {
       console.log(e);
       res.sendStatus(401);

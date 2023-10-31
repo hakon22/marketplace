@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useContext } from 'react';
 import InputMask from 'react-input-mask';
 import {
-  Button, Form, FloatingLabel, Image, AlertHeading, Spinner,
+  Button, Form, FloatingLabel, Image, Alert, Spinner,
 } from 'react-bootstrap';
 import pear from '../images/pear.svg';
 import { fetchLogin } from '../slices/loginSlice';
@@ -30,22 +30,22 @@ const LoginForm = () => {
     onSubmit: async (values, { setFieldError, setSubmitting }) => {
       try {
         const {
-          payload: { token, refreshToken, code },
+          payload: { code, user },
         } = await dispatch(fetchLogin(values));
-        if (token) {
+        if (code === 1) {
           if (values.save) {
-            window.localStorage.setItem('refresh_token', refreshToken);
+            window.localStorage.setItem('refresh_token', user.refreshToken);
           }
           logIn();
-        } else if (code === 1) {
+        } else if (code === 4) {
           setSubmitting(false);
-          setFieldError('email', t('validation.userNotAlreadyExists'));
-        } else if (code === 2) {
-          setSubmitting(false);
-          setFieldError('password', t('validation.incorrectPassword'));
+          setFieldError('phone', t('validation.userNotAlreadyExists'));
         } else if (code === 3) {
           setSubmitting(false);
-          setFieldError('email', t('validation.accountNotActivated'));
+          setFieldError('password', t('validation.incorrectPassword'));
+        } else if (code === 2) {
+          setSubmitting(false);
+          setFieldError('phone', t('validation.accountNotActivated'));
         } else if (!code) {
           setSubmitting(false);
         }
@@ -71,6 +71,7 @@ const LoginForm = () => {
             value={formik.values.phone}
             disabled={formik.isSubmitting}
             isInvalid={!!(formik.errors.phone && formik.submitCount)}
+            isValid={!!(!formik.errors.phone && formik.submitCount)}
             onBlur={formik.handleBlur}
             name="phone"
             autoComplete="on"
@@ -87,6 +88,7 @@ const LoginForm = () => {
             value={formik.values.password}
             disabled={formik.isSubmitting}
             isInvalid={!!(formik.errors.password && formik.submitCount)}
+            isValid={!!(!formik.errors.password && formik.submitCount)}
             onBlur={formik.handleBlur}
             name="password"
             type="password"
@@ -97,10 +99,10 @@ const LoginForm = () => {
           </Form.Control.Feedback>
         </FloatingLabel>
         {formik.submitCount > 2 && (
-          <AlertHeading as="div" className="mb-3 text-start pt-1 pb-1">
+          <Alert className="mb-3 text-start pt-1 pb-1">
             <span>{t('loginForm.forgotPassword')}</span>
             <Link to={routes.recoveryPasswordPage}>{t('loginForm.recovery')}</Link>
-          </AlertHeading>
+          </Alert>
         )}
         <Form.Check
           className="mb-2 text-start"

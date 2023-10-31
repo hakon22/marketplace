@@ -24,7 +24,9 @@ const App = () => {
   const dispatch = useAppDispatch();
   const { width } = window.screen;
   const [isMobile, setIsMobile] = useState(width < 768);
-  const { id, token, error } = useAppSelector((state) => state.login);
+  const {
+    id, token, refreshToken, error,
+  } = useAppSelector((state) => state.login);
   const [loggedIn, setLoggedIn] = useState(false);
   const logIn = () => setLoggedIn(true);
   const logOut = useCallback(async () => {
@@ -32,7 +34,7 @@ const App = () => {
     if (refreshTokenStorage) {
       localStorage.removeItem('refresh_token');
     }
-    await axios.post(routes.deleteAuth, { id, refreshTokenStorage });
+    await axios.post(routes.deleteAuth, { id, refreshToken });
     dispatch(removeToken());
     setLoggedIn(false);
   }, [dispatch, id]);

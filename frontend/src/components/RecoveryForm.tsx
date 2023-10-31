@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useContext, useState } from 'react';
 import { toLower } from 'lodash';
 import {
-  Button, Form, FloatingLabel, Image, Spinner, AlertHeading,
+  Button, Form, FloatingLabel, Image, Spinner, Alert,
 } from 'react-bootstrap';
 import axios from 'axios';
 import orange from '../images/orange.svg';
@@ -46,12 +46,12 @@ const RecoveryForm = () => {
     <div className="d-flex justify-content-center align-items-center gap-5">
       {!isMobile && <Image className="w-25 h-25 me-4" src={orange} alt={t('recoveryForm.title')} roundedCircle />}
       {sendMail ? (
-        <AlertHeading as="div" className="col-12 col-md-5 text-center mb-0">
+        <Alert className="col-12 col-md-5 text-center mb-0">
           <span>{t('recoveryForm.toYourMail')}</span>
           <br />
           <span><b>{sendMail}</b></span>
           <p>{t('recoveryForm.postNewPassword')}</p>
-        </AlertHeading>
+        </Alert>
       ) : (
         <Form
           onSubmit={formik.handleSubmit}

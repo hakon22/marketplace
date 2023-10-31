@@ -34,12 +34,14 @@ const SignupForm = () => {
       try {
         values.username = capitalize(values.username);
         values.email = toLower(values.email);
-        const { data: { code, id } } = await axios.post(routes.signup, values);
+        const { data: { code, id, errorsFields } } = await axios.post(routes.signup, values);
         if (code === 1) {
           navigate(`${routes.activationUrlPage}${id}`);
         } else if (code === 2) {
           setSubmitting(false);
-          setFieldError('email', t('validation.userAlreadyExists'));
+          errorsFields.forEach((field: ('email' | 'phone')) => {
+            setFieldError(field, t('validation.userAlreadyExists'));
+          });
         } else if (!code) {
           setSubmitting(false);
           notify(t('toast.networkError'), 'error');
