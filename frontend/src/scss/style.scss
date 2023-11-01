@@ -18,7 +18,35 @@
   margin-bottom: 2.2em !important;
 }
 
+.marketplace {
+  display: grid;
+  gap: 1.5em;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.card-item {
+
+  .card-img-top {
+    width: 80%;
+  }
+}
+
+.icon-hover:hover {
+  background-color: #e9e9e9;
+  border-radius: 50%;
+}
+
+.mw-50 {
+  max-width: 50%;
+}
+
 @keyframes show {
   0% { opacity: 0; }
   100% { opacity: 1; }
  }
+
+ @media (max-width: 768px) {
+  .marketplace {
+    grid-template-columns: 1fr;
+  }
+}

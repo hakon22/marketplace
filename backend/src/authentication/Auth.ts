@@ -80,10 +80,9 @@ class Auth {
 
   async updateTokens(req: PassportRequest, res: Response) {
     try {
-      const { dataValues: { id, username, refresh_token, email, phone, token, refreshToken } } = req.user;
+      const { dataValues: { id, username, refresh_token, email, phone }, token, refreshToken } = req.user;
       const oldRefreshToken = req.get('Authorization').split(' ')[1];
       const availabilityRefresh = refresh_token.find((token: string) => token === oldRefreshToken);
-      console.log(token);
       if (availabilityRefresh) {
         const newRefreshTokens = refresh_token.filter((token: string) => token !== oldRefreshToken);
         newRefreshTokens.push(refreshToken);
@@ -101,17 +100,19 @@ class Auth {
   async logout(req: Request, res: Response) {
     try {
       const { id, refreshToken } = req.body;
-      const { dataValues: { refresh_token } } = await Users.findOne({
+      const user = await Users.findOne({
         attributes: ['refresh_token'],
         where: { id },
       });
-      if (refresh_token) {
-        const refreshTokens = refresh_token.filter((token) => token !== refreshToken);
-        const newRefreshTokens = refreshTokens.length > 0 ? refreshTokens : null;
-        await Users.update({ refresh_token: newRefreshTokens }, { where: { id } });
-        res.status(200).json({ status: 'Tokens has been deleted' });
-      } else {
-        throw new Error();
+      if (user) {
+        if (user.refresh_token) {
+          const refreshTokens = user.refresh_token.filter((token) => token !== refreshToken);
+          const newRefreshTokens = refreshTokens.length > 0 ? refreshTokens : null;
+          await Users.update({ refresh_token: newRefreshTokens }, { where: { id } });
+          res.status(200).json({ status: 'Tokens has been deleted' });
+        } else {
+          throw new Error();
+        }
       }
     } catch (e) {
       console.log(e);

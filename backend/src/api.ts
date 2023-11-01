@@ -2,6 +2,7 @@ import express from 'express';
 import passport from 'passport';
 import Auth from './authentication/Auth.js';
 import Activation from './activation/Activation.js';
+import Market from './market/Market.js';
 
 const router = express.Router();
 
@@ -18,5 +19,8 @@ router.post(`${apiPath}/activation/`, Activation.activation);
 router.get(`${apiPath}/activation/:id`, Activation.needsActivation);
 router.get(`${apiPath}/activation/repeatEmail/:id`, Activation.repeatEmail);
 router.post(`${apiPath}/activation/changeEmail`, Activation.changeEmail);
+
+router.get(`${apiPath}/market/getAll`, passport.authenticate('jwt', { session: false }), Market.getAll);
+router.post(`${apiPath}/market/create`, Market.create);
 
 export default router;

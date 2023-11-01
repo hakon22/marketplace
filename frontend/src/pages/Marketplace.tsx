@@ -1,16 +1,42 @@
-import { Card } from 'react-bootstrap';
+import { useEffect } from 'react';
 import Helmet from '../components/Helmet';
+import CardItem from '../components/CardItem';
+import { updateTokens } from '../slices/loginSlice';
+import { fetchItems, selectors } from '../slices/marketSlice';
+import { useAppDispatch, useAppSelector } from '../utilities/hooks';
+import Cart from '../components/Cart';
 
-const Marketplace = () => (
-  <div className="col-12 col-md-8 my-4">
-    <Helmet title="Главная" description="Главная страница" />
-    <Card border="warning" bg="light" className="text-center mb-5 d-flex justify-content-center align-items-center">
-      <Card.Header className="fs-4 col-12">Добавление пользователя</Card.Header>
-      <Card.Body className="col-12 col-xl-8 d-flex justify-content-center">
-        test
-      </Card.Body>
-    </Card>
-  </div>
-);
+const Marketplace = () => {
+  const dispatch = useAppDispatch();
+
+  const { refreshToken, token } = useAppSelector((state) => state.login);
+  const items = useAppSelector(selectors.selectAll);
+
+  useEffect(() => {
+    if (token) {
+      dispatch(fetchItems(token));
+    }
+  }, []);
+
+  useEffect(() => {
+    if (refreshToken !== null) {
+      const fetch = () => dispatch(updateTokens(refreshToken));
+
+      const timeAlive = setTimeout(fetch, 595000);
+      return () => clearTimeout(timeAlive);
+    }
+    return undefined;
+  }, [refreshToken]);
+
+  return (
+    <div className="col-12 my-4">
+      <Helmet title="Главная" description="Главная страница" />
+      <Cart />
+      <div className="marketplace">
+        {items.map((item) => <CardItem key={item.id} item={item} />)}
+      </div>
+    </div>
+  );
+};
 
 export default Marketplace;

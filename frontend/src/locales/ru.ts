@@ -20,7 +20,7 @@ export default {
       description: 'Восстановление пароля',
       rememberPassword: 'Вспомнили пароль? ',
       toYourMail: 'На вашу почту',
-      postNewPassword: 'был выслан новый пароль.',
+      postNewPassword: 'был выслан новый пароль',
     },
     signupForm: {
       title: 'Регистрация',

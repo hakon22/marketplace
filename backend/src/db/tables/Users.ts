@@ -16,10 +16,9 @@ interface UserModel extends Model<InferAttributes<UserModel>, InferCreationAttri
 
 export interface PassportRequest extends Request {
   user: {
-    dataValues: UserModel & {
-      token: string;
-      refreshToken: string;
-    }
+    dataValues: UserModel;
+    token: string;
+    refreshToken: string;
   }
 }
 

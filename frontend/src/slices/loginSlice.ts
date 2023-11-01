@@ -32,21 +32,21 @@ export const fetchTokenStorage = createAsyncThunk(
 
 export const updateTokens = createAsyncThunk(
   'login/updateTokens',
-  async (refresh: string) => {
+  async (refresh: string | undefined) => {
     const refreshTokenStorage = window.localStorage.getItem('refresh_token');
     if (refreshTokenStorage) {
       const { data } = await axios.get(routes.updateTokens, {
         headers: { Authorization: `Bearer ${refreshTokenStorage}` },
       });
-      if (data.refreshToken) {
-        window.localStorage.setItem('refresh_token', data.refreshToken);
+      if (data.user.refreshToken) {
+        window.localStorage.setItem('refresh_token', data.user.refreshToken);
         return data;
       }
     } else {
       const { data } = await axios.get(routes.updateTokens, {
         headers: { Authorization: `Bearer ${refresh}` },
       });
-      if (data.refreshToken) {
+      if (data.user.refreshToken) {
         return data;
       }
     }

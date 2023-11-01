@@ -34,7 +34,7 @@ const App = () => {
     if (refreshTokenStorage) {
       localStorage.removeItem('refresh_token');
     }
-    await axios.post(routes.deleteAuth, { id, refreshToken });
+    await axios.post(routes.logout, { id, refreshToken });
     dispatch(removeToken());
     setLoggedIn(false);
   }, [dispatch, id]);
@@ -89,9 +89,9 @@ const App = () => {
       <MobileContext.Provider value={isMobile}>
         <BrowserRouter basename="/marketplace">
           <NavBar />
-          <hr className="mb-4 mt-0" />
+          <hr className="mt-0" />
           <div className="container">
-            <div className="row d-flex justify-content-center">
+            <div className="my-4 row d-flex justify-content-center">
               <Routes>
                 <Route
                   path={routes.homePage}

@@ -17,8 +17,6 @@ export default (passport: PassportStatic) => passport.use(
       if (user) {
         const token = generateAccessToken(id, email);
         const refreshToken = generateRefreshToken(id, email);
-        // user.token = token;
-        // user.refreshToken = refreshToken;
         done(null, { ...user, token, refreshToken });
       } else {
         done(null, false);

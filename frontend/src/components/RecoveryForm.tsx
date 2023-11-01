@@ -50,7 +50,8 @@ const RecoveryForm = () => {
           <span>{t('recoveryForm.toYourMail')}</span>
           <br />
           <span><b>{sendMail}</b></span>
-          <p>{t('recoveryForm.postNewPassword')}</p>
+          <br />
+          <span>{t('recoveryForm.postNewPassword')}</span>
         </Alert>
       ) : (
         <Form

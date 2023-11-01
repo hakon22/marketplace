@@ -17,7 +17,8 @@ export default {
   activation: [apiPath, 'activation/'].join('/'),
   activationRepeatEmail: [apiPath, 'activation', 'repeatEmail/'].join('/'),
   activationChangeEmail: [apiPath, 'activation', 'changeEmail'].join('/'),
-  deleteAuth: [apiPath, 'auth', 'logout'].join('/'),
+  logout: [apiPath, 'auth', 'logout'].join('/'),
   recoveryPassword: [apiPath, 'auth', 'recoveryPassword'].join('/'),
   updateTokens: [apiPath, 'auth', 'updateTokens'].join('/'),
+  getAllItems: [apiPath, 'market', 'getAll'].join('/'),
 } as ApiUrl;
