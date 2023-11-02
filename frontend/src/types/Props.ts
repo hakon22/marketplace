@@ -18,4 +18,5 @@ export type CardItemProps = {
 export type ModalCartProps = Modal & {
   items: (Cart | undefined)[];
   priceAndCount: PriceAndCount;
+  setMarginScroll: () => void;
 }

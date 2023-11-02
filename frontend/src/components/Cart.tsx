@@ -7,6 +7,17 @@ import { useAppSelector } from '../utilities/hooks';
 import type { PriceAndCount } from '../types/Cart';
 
 const Cart = () => {
+  const scrollPx = () => window.innerWidth - document.body.clientWidth;
+  const [scrollBar, setScrollBar] = useState(scrollPx());
+  const setMarginScroll = () => {
+    const px = scrollPx();
+    if (px) {
+      setScrollBar(px - 1);
+    } else {
+      setScrollBar(px);
+    }
+  };
+
   const [show, setShow] = useState(true);
   const modalClose = (arg?: boolean) => setShow(!!arg);
   const modalShow = () => setShow(true);
@@ -24,7 +35,13 @@ const Cart = () => {
 
   return priceAndCount.count ? (
     <>
-      <ModalCart items={items} priceAndCount={priceAndCount} show={show} onHide={modalClose} />
+      <ModalCart
+        items={items}
+        priceAndCount={priceAndCount}
+        show={show}
+        onHide={modalClose}
+        setMarginScroll={setMarginScroll}
+      />
       <OverlayTrigger
         placement="left"
         overlay={(
@@ -33,7 +50,7 @@ const Cart = () => {
           </Tooltip>
   )}
       >
-        <Button className="cart" onClick={modalShow}>
+        <Button className="cart" onClick={modalShow} style={{ marginRight: scrollBar }}>
           <Purchases />
           <span className="cart__badge">{priceAndCount.count}</span>
         </Button>

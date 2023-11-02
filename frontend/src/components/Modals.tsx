@@ -118,7 +118,7 @@ const ModalChangeActivationEmail = ({
 };
 
 export const ModalCart = ({
-  items, priceAndCount, onHide, show,
+  items, priceAndCount, onHide, show, setMarginScroll,
 }: ModalCartProps) => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
@@ -162,6 +162,8 @@ export const ModalCart = ({
       show={show}
       onHide={onHide}
       dialogClassName="mw-50"
+      onEnter={setMarginScroll}
+      onExited={setMarginScroll}
       centered
     >
       <Modal.Header closeButton>
