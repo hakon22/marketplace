@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useContext } from 'react';
 import {
   Form, Modal, Button, Spinner,
 } from 'react-bootstrap';
@@ -13,6 +13,7 @@ import routes from '../routes';
 import { changeEmailActivation } from '../slices/loginSlice';
 import { cartUpdate, cartRemove, cartRemoveAll } from '../slices/cartSlice';
 import notify from '../utilities/toast';
+import { MobileContext } from './Context';
 import { emailValidation } from '../validations/validations';
 import { ModalActivateProps, ModalCartProps } from '../types/Props';
 
@@ -65,14 +66,14 @@ const ModalChangeActivationEmail = ({
       }}
     >
       <Modal.Header closeButton>
-        <Modal.Title>{t('modal.changeEmailTitle')}</Modal.Title>
+        <Modal.Title>{t('modal.changeEmail.changeEmailTitle')}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Form
           onSubmit={formik.handleSubmit}
         >
           <Form.Group className="position-relative" controlId="email">
-            <Form.Label className="visually-hidden">{t('modal.newEmail')}</Form.Label>
+            <Form.Label className="visually-hidden">{t('modal.changeEmail.newEmail')}</Form.Label>
             <Form.Control
               autoFocus
               ref={input}
@@ -97,7 +98,7 @@ const ModalChangeActivationEmail = ({
                 formik.errors.email = '';
               }}
             >
-              {t('modal.close')}
+              {t('modal.changeEmail.close')}
             </Button>
             <Button variant="success" type="submit" disabled={formik.isSubmitting}>
               {formik.isSubmitting ? (
@@ -108,7 +109,7 @@ const ModalChangeActivationEmail = ({
                   role="status"
                   aria-hidden="true"
                 />
-              ) : t('modal.submitChange')}
+              ) : t('modal.changeEmail.submitChange')}
             </Button>
           </div>
         </Form>
@@ -124,6 +125,7 @@ export const ModalCart = ({
   const dispatch = useAppDispatch();
 
   const [isSendOrder, setIsSetOrder] = useState(false);
+  const isMobile = useContext(MobileContext);
 
   const setCount = (id: number, count: number) => (count < 1
     ? dispatch(cartRemove(id))
@@ -139,10 +141,10 @@ export const ModalCart = ({
       centered
     >
       <Modal.Header closeButton>
-        <Modal.Title>Заказ принят!</Modal.Title>
+        <Modal.Title>{t('modal.cart.orderAccept')}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <div className="fs-4">Спасибо за заказ!</div>
+        <div className="fs-4">{t('modal.cart.gratitude')}</div>
         <div className="d-flex justify-content-end">
           <Button
             className="me-2"
@@ -152,7 +154,7 @@ export const ModalCart = ({
               dispatch(cartRemoveAll());
             }}
           >
-            {t('modal.close')}
+            {t('modal.changeEmail.close')}
           </Button>
         </div>
       </Modal.Body>
@@ -161,13 +163,13 @@ export const ModalCart = ({
     <Modal
       show={show}
       onHide={onHide}
-      dialogClassName="mw-50"
+      dialogClassName={isMobile ? '' : 'mw-50'}
       onEnter={setMarginScroll}
       onExited={setMarginScroll}
       centered
     >
       <Modal.Header closeButton>
-        <Modal.Title>Ваш заказ:</Modal.Title>
+        <Modal.Title>{t('modal.cart.title')}</Modal.Title>
       </Modal.Header>
       <Form onSubmit={() => {
         setIsSetOrder(true);
@@ -188,6 +190,7 @@ export const ModalCart = ({
                   <span className="col-5 col-xl-3 fs-5 text-xl-center d-flex align-items-center gap-2">
                     <DashCircle
                       role="button"
+                      title={t('modal.cart.decrease')}
                       className="icon-hover"
                       onClick={() => {
                         setCount(id, count - 1);
@@ -196,16 +199,18 @@ export const ModalCart = ({
                     {`${count} ${unit}`}
                     <PlusCircle
                       role="button"
+                      title={t('modal.cart.increase')}
                       className="icon-hover"
                       onClick={() => {
                         setCount(id, count + 1);
                       }}
                     />
                   </span>
-                  <span className="col-5 col-xl-3 fs-6">{`${price * count},00 ₽`}</span>
+                  <span className="col-5 col-xl-3 fs-6">{t('modal.cart.price', { price: price * count })}</span>
                   <span className="col-2 col-xl-1 d-flex align-items-center">
                     <XCircle
                       role="button"
+                      title={t('modal.cart.remove')}
                       className="fs-5 icon-hover"
                       onClick={() => {
                         dispatch(cartRemove(id));
@@ -220,7 +225,7 @@ export const ModalCart = ({
         </Modal.Body>
         <Modal.Footer className="d-flex justify-content-between py-4">
           <div className="d-flex gap-2">
-            <Button variant="success" size="sm" type="submit">Оформить заказ</Button>
+            <Button variant="success" size="sm" type="submit">{t('modal.cart.sendOrder')}</Button>
             <Button
               variant="danger"
               size="sm"
@@ -229,11 +234,11 @@ export const ModalCart = ({
                 dispatch(cartRemoveAll());
               }}
             >
-              Очистить корзину
+              {t('modal.cart.clearCart')}
             </Button>
           </div>
           <span className="text-end fw-bolder fs-6">
-            {`Сумма: ${priceAndCount.price},00 ₽`}
+            {t('modal.cart.summ', { price: priceAndCount.price })}
           </span>
         </Modal.Footer>
       </Form>

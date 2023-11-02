@@ -16,7 +16,7 @@ const port = process.env.PORT || 3001;
 
 const buildPath = process.env.DB === 'LOCAL'
   ? join(__dirname, '..', '..', 'frontend', 'public')
-  : join(__dirname, '..', 'build');
+  : join(__dirname, '..', 'frontend');
 
 app.use(express.static(buildPath));
 app.use(express.json());

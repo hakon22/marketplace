@@ -77,10 +77,33 @@ export default {
       description: 'За покупками - к нам!',
     },
     modal: {
-      changeEmailTitle: 'Изменить почту',
-      newEmail: 'Новая почта',
-      close: 'Закрыть',
-      submitChange: 'Изменить',
+      changeEmail: {
+        changeEmailTitle: 'Изменить почту',
+        newEmail: 'Новая почта',
+        close: 'Закрыть',
+        submitChange: 'Изменить',
+      },
+      cart: {
+        title: 'Ваш заказ:',
+        decrease: 'Уменьшить',
+        increase: 'Увеличить',
+        remove: 'Удалить',
+        price: '{{ price }},00 ₽',
+        summ: 'Сумма: {{ price }},00 ₽',
+        sendOrder: 'Отправить заказ',
+        clearCart: 'Очистить корзину',
+        orderAccept: 'Заказ принят!',
+        gratitude: 'Спасибо за заказ!',
+      },
+    },
+    cart: {
+      summ: '= {{ price }},00 ₽',
+    },
+    cardItem: {
+      price: '{{ price }},00 ₽',
+      subtitle: '{{ price }},00 ₽/{{ unit }}',
+      addToCart: 'В корзину',
+      inCart: 'В корзине',
     },
   },
 };

@@ -1,5 +1,6 @@
 import { Card, Button } from 'react-bootstrap';
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { cartAdd, cartUpdate, selectors } from '../slices/cartSlice';
 import { useAppDispatch, useAppSelector } from '../utilities/hooks';
 import fetchImage from '../utilities/fetchImage';
@@ -10,6 +11,7 @@ const CardItem = ({ item }: CardItemProps) => {
     id, name, image, unit, price,
   } = item;
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
 
   const [srcImage, setSrcImage] = useState('');
   const countInCart = useAppSelector((state) => selectors.selectById(state, id))?.count;
@@ -24,10 +26,10 @@ const CardItem = ({ item }: CardItemProps) => {
       <Card.Body className="pt-0">
         <div className="d-flex justify-content-between align-items-center mb-3">
           <Card.Title>{name}</Card.Title>
-          <Card.Subtitle className="text-muted">{`${price},00 ₽/${unit}`}</Card.Subtitle>
+          <Card.Subtitle className="text-muted">{t('cardItem.subtitle', { price, unit })}</Card.Subtitle>
         </div>
         <Card.Text className="fs-bold fs-4">
-          {`${price},00 ₽`}
+          {t('cardItem.price', { price })}
         </Card.Text>
         <div className="d-flex justify-content-center">
           <Button
@@ -45,7 +47,7 @@ const CardItem = ({ item }: CardItemProps) => {
               }
             }}
           >
-            {countInCart ? 'В корзине' : 'В корзину'}
+            {countInCart ? t('cardItem.inCart') : t('cardItem.addToCart')}
           </Button>
         </div>
       </Card.Body>

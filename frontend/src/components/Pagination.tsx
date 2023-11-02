@@ -2,11 +2,11 @@ import { Pagination as BootstrapPagination } from 'react-bootstrap';
 import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import type { PaginationProps } from '../types/Pagination';
-import type { User } from '../types/User';
+import type { Item } from '../types/Item';
 
 const Pagination = ({
   data, showedData, setShowData, rowsPerPage, scrollRef, loadingStatus, searchId,
-}: PaginationProps<User[]>) => {
+}: PaginationProps<Item[]>) => {
   const navigate = useNavigate();
   const [urlParams] = useSearchParams();
   const urlPage = Number(urlParams.get('page'));
@@ -66,7 +66,7 @@ const Pagination = ({
     }
   }, [searchId]);
 
-  return <BootstrapPagination className="d-flex justify-content-center align-items-center">{items}</BootstrapPagination>;
+  return <BootstrapPagination className="d-flex justify-content-center align-items-center mt-5">{items}</BootstrapPagination>;
 };
 
 export default Pagination;

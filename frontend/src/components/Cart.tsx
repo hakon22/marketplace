@@ -1,12 +1,15 @@
 import { OverlayTrigger, Tooltip, Button } from 'react-bootstrap';
 import { Cart as Purchases } from 'react-bootstrap-icons';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ModalCart } from './Modals';
 import { selectors } from '../slices/cartSlice';
 import { useAppSelector } from '../utilities/hooks';
 import type { PriceAndCount } from '../types/Cart';
 
 const Cart = () => {
+  const { t } = useTranslation();
+
   const scrollPx = () => window.innerWidth - document.body.clientWidth;
   const [scrollBar, setScrollBar] = useState(scrollPx());
   const setMarginScroll = () => {
@@ -46,7 +49,7 @@ const Cart = () => {
         placement="left"
         overlay={(
           <Tooltip>
-            {`= ${priceAndCount.price},00 ₽`}
+            {t('cart.summ', { price: priceAndCount.price })}
           </Tooltip>
   )}
       >
