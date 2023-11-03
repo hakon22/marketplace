@@ -43,7 +43,7 @@ const CardItem = ({ item }: CardItemProps) => {
             ? (
               <div className="d-flex justify-content-center align-items-center gap-4">
                 <DashCircle
-                  className="fs-3 text-success icon-hover"
+                  className="fs-3 text-success icon-hover animate__animated animate__fadeInLeft"
                   role="button"
                   onClick={() => {
                     setCount(id, countInCart - 1);
@@ -51,7 +51,7 @@ const CardItem = ({ item }: CardItemProps) => {
                 />
                 <span className="fs-5">{countInCart}</span>
                 <PlusCircle
-                  className="fs-3 text-success icon-hover"
+                  className="fs-3 text-success icon-hover animate__animated animate__fadeInRight"
                   role="button"
                   onClick={() => {
                     setCount(id, countInCart + 1);

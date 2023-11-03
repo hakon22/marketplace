@@ -36,30 +36,31 @@ const Cart = () => {
     return acc;
   }, initialObject);
 
-  return priceAndCount.count ? (
+  return (
     <>
       <ModalCart
         items={items}
         priceAndCount={priceAndCount}
-        show={show}
+        show={show && !!priceAndCount.count}
         onHide={modalClose}
         setMarginScroll={setMarginScroll}
       />
       <OverlayTrigger
         placement="left"
+        show={!!priceAndCount.count}
         overlay={(
-          <Tooltip>
+          <Tooltip style={{ marginRight: scrollBar ? scrollBar + 1 : scrollBar }}>
             {t('cart.summ', { price: priceAndCount.price })}
           </Tooltip>
-  )}
+        )}
       >
-        <Button className="cart" onClick={modalShow} style={{ marginRight: scrollBar }}>
+        <Button className="cart" onClick={modalShow} style={{ marginRight: scrollBar, display: priceAndCount.count ? 'unset' : 'none' }}>
           <Purchases />
           <span className="cart__badge">{priceAndCount.count}</span>
         </Button>
       </OverlayTrigger>
     </>
-  ) : null;
+  );
 };
 
 export default Cart;
