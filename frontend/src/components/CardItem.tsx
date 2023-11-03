@@ -1,7 +1,10 @@
 import { Card, Button } from 'react-bootstrap';
+import { PlusCircle, DashCircle } from 'react-bootstrap-icons';
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { cartAdd, cartUpdate, selectors } from '../slices/cartSlice';
+import {
+  cartAdd, cartUpdate, cartRemove, selectors,
+} from '../slices/cartSlice';
 import { useAppDispatch, useAppSelector } from '../utilities/hooks';
 import fetchImage from '../utilities/fetchImage';
 import type { CardItemProps } from '../types/Props';
@@ -15,6 +18,10 @@ const CardItem = ({ item }: CardItemProps) => {
 
   const [srcImage, setSrcImage] = useState('');
   const countInCart = useAppSelector((state) => selectors.selectById(state, id))?.count;
+
+  const setCount = (itemId: number, count: number) => (count < 1
+    ? dispatch(cartRemove(itemId))
+    : dispatch(cartUpdate({ id: itemId, changes: { count } })));
 
   useEffect(() => {
     fetchImage(image, setSrcImage);
@@ -31,24 +38,39 @@ const CardItem = ({ item }: CardItemProps) => {
         <Card.Text className="fs-bold fs-4">
           {t('cardItem.price', { price })}
         </Card.Text>
-        <div className="d-flex justify-content-center">
-          <Button
-            variant={countInCart ? 'outline-success' : 'success'}
-            onClick={() => {
-              if (countInCart) {
-                dispatch(cartUpdate({
-                  id,
-                  changes: { count: countInCart + 1 },
-                }));
-              } else {
-                dispatch(cartAdd({
-                  id, name, price, image: srcImage, unit, count: 1,
-                }));
-              }
-            }}
-          >
-            {countInCart ? t('cardItem.inCart') : t('cardItem.addToCart')}
-          </Button>
+        <div className="d-flex justify-content-center min-height-38">
+          {countInCart
+            ? (
+              <div className="d-flex justify-content-center align-items-center gap-4">
+                <DashCircle
+                  className="fs-3 text-success icon-hover"
+                  role="button"
+                  onClick={() => {
+                    setCount(id, countInCart - 1);
+                  }}
+                />
+                <span className="fs-5">{countInCart}</span>
+                <PlusCircle
+                  className="fs-3 text-success icon-hover"
+                  role="button"
+                  onClick={() => {
+                    setCount(id, countInCart + 1);
+                  }}
+                />
+              </div>
+            )
+            : (
+              <Button
+                variant="success"
+                onClick={() => {
+                  dispatch(cartAdd({
+                    id, name, price, image: srcImage, unit, count: 1,
+                  }));
+                }}
+              >
+                {t('cardItem.addToCart')}
+              </Button>
+            ) }
         </div>
       </Card.Body>
     </Card>
