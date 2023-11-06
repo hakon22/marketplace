@@ -1,6 +1,7 @@
 import { Card, Button } from 'react-bootstrap';
 import { PlusCircle, DashCircle } from 'react-bootstrap-icons';
 import { useState, useEffect } from 'react';
+import { Rate } from 'antd';
 import { useTranslation } from 'react-i18next';
 import {
   cartAdd, cartUpdate, cartRemove, selectors,
@@ -15,6 +16,7 @@ const CardItem = ({ item }: CardItemProps) => {
   } = item;
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
+  const { hostname } = window.location;
 
   const [srcImage, setSrcImage] = useState('');
   const countInCart = useAppSelector((state) => selectors.selectById(state, id))?.count;
@@ -24,13 +26,18 @@ const CardItem = ({ item }: CardItemProps) => {
     : dispatch(cartUpdate({ id: itemId, changes: { count } })));
 
   useEffect(() => {
-    fetchImage(image, setSrcImage);
+    if (hostname === 'localhost') {
+      fetchImage(image, setSrcImage);
+    } else {
+      setSrcImage(`${process.env.PUBLIC_URL}/static/media/${image}`);
+    }
   }, []);
 
   return (
     <Card className="card-item">
       <Card.Img variant="top" className="mx-auto" src={srcImage} />
       <Card.Body className="pt-0">
+        <Rate disabled defaultValue={4.5} />
         <div className="d-flex justify-content-between align-items-center mb-3">
           <Card.Title>{name}</Card.Title>
           <Card.Subtitle className="text-muted">{t('cardItem.subtitle', { price, unit })}</Card.Subtitle>

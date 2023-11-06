@@ -8,6 +8,7 @@ import {
 import axios from 'axios';
 import notify from '../utilities/toast';
 import Marketplace from '../pages/Marketplace';
+import CreateItem from './CreateItem';
 import NavBar from './NavBar';
 import Page404 from '../pages/Page404';
 import Login from '../pages/Login';
@@ -103,6 +104,7 @@ const App = () => {
                 <Route path={routes.signupPage} element={<Signup />} />
                 <Route path={routes.activationPage} element={<Activation />} />
                 <Route path={routes.recoveryPasswordPage} element={<Recovery />} />
+                <Route path={routes.createItemPage} element={<CreateItem />} />
                 <Route path={routes.notFoundPage} element={<Page404 />} />
               </Routes>
             </div>

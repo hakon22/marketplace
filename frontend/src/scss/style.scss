@@ -22,12 +22,19 @@
   display: grid;
   gap: 1.5em;
   grid-template-columns: repeat(4, 1fr);
+
+  .ant-upload-list-picture-card {
+    .ant-upload-list-item-container ~ .ant-upload-select {
+      display: none;
+    }
+  }
 }
 
 .card-item {
 
   .card-img-top {
     width: 80%;
+    height: 48.16%;
   }
 
   &:hover {
@@ -44,6 +51,10 @@
 
   .min-height-38 {
     min-height: 38px;
+  }
+  
+  .ant-rate {
+    font-size: small;
   }
 }
 
@@ -64,5 +75,9 @@
  @media (max-width: 768px) {
   .marketplace {
     grid-template-columns: 1fr;
+
+    .input-group-sm > .form-select {
+      padding-right: 0;
+    }
   }
 }

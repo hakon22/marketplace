@@ -11,6 +11,7 @@ export default {
   recoveryPasswordPage: '/recovery',
   activationPage: '/activation/:id',
   activationUrlPage: '/activation/',
+  createItemPage: '/create',
   notFoundPage: '*',
   login: [apiPath, 'auth', 'login'].join('/'),
   signup: [apiPath, 'auth', 'signup'].join('/'),
@@ -21,4 +22,5 @@ export default {
   recoveryPassword: [apiPath, 'auth', 'recoveryPassword'].join('/'),
   updateTokens: [apiPath, 'auth', 'updateTokens'].join('/'),
   getAllItems: [apiPath, 'market', 'getAll'].join('/'),
+  createItem: [apiPath, 'market', 'upload'].join('/'),
 } as ApiUrl;
