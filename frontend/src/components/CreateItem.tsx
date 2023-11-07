@@ -1,12 +1,12 @@
 import {
-  Form, Button, Card, InputGroup,
+  Form, Button, Card, InputGroup, Spinner,
 } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 import { useFormik } from 'formik';
 import ImgCrop from 'antd-img-crop';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { PlusOutlined } from '@ant-design/icons';
-import { Upload } from 'antd';
+import { Upload, Tooltip } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import notify from '../utilities/toast';
@@ -26,6 +26,14 @@ const CreateItem = () => {
       unit: 'кг',
       count: '',
       price: '',
+      discountPrice: '',
+      composition: '',
+      foodValues: {
+        carbohydrates: '',
+        fats: '',
+        proteins: '',
+        ccal: '',
+      },
       discount: '',
     },
     onSubmit: async (values, { setSubmitting }) => {
@@ -51,15 +59,9 @@ const CreateItem = () => {
   const updatePrice = () => {
     const { price, discount } = formik.values;
     const newPrice = Number(price) * (1 - Number(discount) / 100);
-    formik.setFieldValue('price', roundingEldorado(newPrice));
-    setIsDiscount(false);
+    formik.setFieldValue('discountPrice', roundingEldorado(newPrice));
+    setTimeout(() => setIsDiscount(false), 1);
   };
-
-  useEffect(() => {
-    if (formik.values.discount && formik.values.price && !isDiscount) {
-      setIsDiscount(true);
-    }
-  }, [formik.values.discount, formik.values.price]);
 
   return (
     <div className="marketplace d-flex justify-content-center">
@@ -103,27 +105,41 @@ const CreateItem = () => {
               </Form.Control.Feedback>
             </Form.Group>
             <Card.Text as="div">
-              <div className="d-flex justify-content-between">
+              <div className="d-flex justify-content-between mb-3">
                 <Form.Group className="col-7" controlId="price">
                   <Form.Label className="visually-hidden">Price</Form.Label>
-                  <InputGroup size="sm" className="mb-3">
-                    <Form.Control
-                      placeholder="Цена"
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
-                      isInvalid={!!(formik.errors.price && formik.submitCount)}
-                      autoComplete="on"
-                      type="text"
-                      value={formik.values.price}
-                      name="price"
-                    />
+                  <InputGroup size="sm">
+                    {formik.values.discountPrice
+                    && (
+                    <Tooltip title="Цена со скидкой" color="green" placement="top">
+                      <InputGroup.Text id="inputGroup-priceOrig" className="text-success">{formik.values.discountPrice}</InputGroup.Text>
+                    </Tooltip>
+                    )}
+                    <Tooltip title={formik.values.discountPrice ? 'Старая цена' : ''} color="volcano" placement="topLeft">
+                      <Form.Control
+                        placeholder="Цена"
+                        className={formik.values.discountPrice && 'text-danger'}
+                        onChange={({ target }) => {
+                          if (formik.values.discount && !isDiscount) {
+                            setIsDiscount(true);
+                          }
+                          formik.setFieldValue('price', target.value.replace(/[^\d]/g, ''));
+                        }}
+                        onBlur={formik.handleBlur}
+                        isInvalid={!!(formik.errors.price && formik.submitCount)}
+                        autoComplete="on"
+                        type="text"
+                        value={formik.values.price}
+                        name="price"
+                      />
+                    </Tooltip>
                     <InputGroup.Text id="inputGroup-price">₽</InputGroup.Text>
                   </InputGroup>
                   <Form.Control.Feedback type="invalid" tooltip>
                     {formik.errors.price}
                   </Form.Control.Feedback>
                 </Form.Group>
-                <Form.Group className="mb-3 col-4" controlId="unit">
+                <Form.Group className="col-4" controlId="unit">
                   <Form.Label className="visually-hidden">Unit</Form.Label>
                   <InputGroup size="sm">
                     <InputGroup.Text id="inputGroup-discount">за</InputGroup.Text>
@@ -141,8 +157,8 @@ const CreateItem = () => {
                   </InputGroup>
                 </Form.Group>
               </div>
-              <div className="d-flex justify-content-between">
-                <Form.Group className="mb-3 col-7" controlId="count">
+              <div className="d-flex justify-content-between mb-3">
+                <Form.Group className="col-7" controlId="count">
                   <Form.Label className="visually-hidden">Count</Form.Label>
                   <Form.Control
                     size="sm"
@@ -153,7 +169,7 @@ const CreateItem = () => {
                     type="text"
                     value={formik.values.count}
                     name="count"
-                    placeholder="Остаток"
+                    placeholder="Остаток товара"
                   />
                   <Form.Control.Feedback type="invalid" tooltip>
                     {formik.errors.count}
@@ -164,7 +180,17 @@ const CreateItem = () => {
                   <InputGroup size="sm">
                     <Form.Control
                       placeholder="Скидка"
-                      onChange={formik.handleChange}
+                      onChange={({ target }) => {
+                        const value = target.value.replace(/[^\d]/g, '');
+                        if (!value || Number(value) === 0 || Number(value) > 99) {
+                          setIsDiscount(false);
+                          formik.setFieldValue('discountPrice', '');
+                          return formik.setFieldValue('discount', '');
+                        } if (!isDiscount && value) {
+                          setIsDiscount(true);
+                        }
+                        return formik.setFieldValue('discount', value);
+                      }}
                       onBlur={formik.handleBlur}
                       isInvalid={!!(formik.errors.discount && formik.submitCount)}
                       autoComplete="on"
@@ -180,15 +206,115 @@ const CreateItem = () => {
                   </Form.Control.Feedback>
                 </Form.Group>
               </div>
+              <div className="mb-3">Пищевая ценность на 100гр:</div>
+              <div className="d-flex justify-content-between mb-3">
+                <Form.Group className="col-3" controlId="carbohydrates">
+                  <Form.Label className="visually-hidden">Углеводы</Form.Label>
+                  <Form.Control
+                    size="sm"
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    isInvalid={!!(formik.errors.foodValues?.carbohydrates && formik.submitCount)}
+                    autoComplete="on"
+                    type="text"
+                    value={formik.values.foodValues.carbohydrates}
+                    name="foodValues.carbohydrates"
+                    placeholder="Углеводы"
+                  />
+                  <Form.Control.Feedback type="invalid" tooltip>
+                    {formik.errors.foodValues?.carbohydrates}
+                  </Form.Control.Feedback>
+                </Form.Group>
+                <Form.Group className="col-3" controlId="fats">
+                  <Form.Label className="visually-hidden">Жиры</Form.Label>
+                  <Form.Control
+                    size="sm"
+                    placeholder="Жиры"
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    isInvalid={!!(formik.errors.foodValues?.fats && formik.submitCount)}
+                    autoComplete="on"
+                    type="text"
+                    value={formik.values.foodValues.fats}
+                    name="foodValues.fats"
+                  />
+                  <Form.Control.Feedback type="invalid" tooltip>
+                    {formik.errors.foodValues?.fats}
+                  </Form.Control.Feedback>
+                </Form.Group>
+                <Form.Group className="col-3" controlId="proteins">
+                  <Form.Label className="visually-hidden">Белки</Form.Label>
+                  <Form.Control
+                    size="sm"
+                    placeholder="Белки"
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    isInvalid={!!(formik.errors.foodValues?.proteins && formik.submitCount)}
+                    autoComplete="on"
+                    type="text"
+                    value={formik.values.foodValues.proteins}
+                    name="foodValues.proteins"
+                  />
+                  <Form.Control.Feedback type="invalid" tooltip>
+                    {formik.errors.foodValues?.proteins}
+                  </Form.Control.Feedback>
+                </Form.Group>
+                <Form.Group className="col-3" controlId="ccal">
+                  <Form.Label className="visually-hidden">Ккал</Form.Label>
+                  <Form.Control
+                    size="sm"
+                    placeholder="Ккал"
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    isInvalid={!!(formik.errors.foodValues?.ccal && formik.submitCount)}
+                    autoComplete="on"
+                    type="text"
+                    value={formik.values.foodValues.ccal}
+                    name="foodValues.ccal"
+                  />
+                  <Form.Control.Feedback type="invalid" tooltip>
+                    {formik.errors.foodValues?.ccal}
+                  </Form.Control.Feedback>
+                </Form.Group>
+              </div>
+              <Form.Group className="mb-3" controlId="composition">
+                <Form.Label className="visually-hidden">Сосав</Form.Label>
+                <Form.Control
+                  size="sm"
+                  as="textarea"
+                  placeholder="Опишите состав"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  isInvalid={!!(formik.errors.composition && formik.submitCount)}
+                  autoComplete="on"
+                  type="text"
+                  value={formik.values.composition}
+                  name="composition"
+                />
+                <Form.Control.Feedback type="invalid" tooltip>
+                  {formik.errors.composition}
+                </Form.Control.Feedback>
+              </Form.Group>
             </Card.Text>
-            <div className="d-flex justify-content-center my-2">
+            <div className="d-flex justify-content-center">
               {isDiscount ? (
-                <Button variant="outline-success" type="button" onClick={updatePrice}>
+                <Button variant="outline-success" onClick={updatePrice}>
                   Обновить цену
                 </Button>
               ) : (
-                <Button variant="success" type="submit" disabled={isDiscount || formik.isSubmitting}>
-                  Добавить товар
+                <Button variant="success" type="submit" disabled={formik.isSubmitting}>
+                  {formik.isSubmitting
+                    ? (
+                      <Spinner
+                        as="span"
+                        animation="border"
+                        size="sm"
+                        role="status"
+                        aria-hidden="true"
+                        variant="success"
+                      />
+                    )
+                    : 'Добавить товар'}
                 </Button>
               )}
             </div>

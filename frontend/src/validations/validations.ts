@@ -70,3 +70,32 @@ export const activationValidation = yup.object().shape({
     .transform((value) => value.replace(/[^\d]/g, ''))
     .test('code', 'Введите 4 цифры', (value) => value.length === 4),
 });
+
+export const createItemValidation = yup.object().shape({
+  name: yup
+    .string()
+    .trim()
+    .required()
+    .min(3),
+  image: yup
+    .mixed()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .test('fileSize', 'The file is too large', (value: any) => {
+      if (!value.length) return true;
+      return value?.size <= 2000000;
+    }),
+  phone: yup
+    .string()
+    .trim()
+    .required()
+    .transform((value) => value.replace(/[^\d]/g, ''))
+    .length(11),
+  password: yup
+    .string()
+    .required()
+    .min(6, 'validation.passMin'),
+  confirmPassword: yup
+    .string()
+    .required()
+    .oneOf([yup.ref('password')]),
+});
