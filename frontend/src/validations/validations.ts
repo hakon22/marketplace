@@ -79,23 +79,20 @@ export const createItemValidation = yup.object().shape({
     .min(3),
   image: yup
     .mixed()
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    .test('fileSize', 'The file is too large', (value: any) => {
-      if (!value.length) return true;
-      return value?.size <= 2000000;
-    }),
-  phone: yup
+    .required(),
+  unit: yup
     .string()
-    .trim()
-    .required()
-    .transform((value) => value.replace(/[^\d]/g, ''))
-    .length(11),
-  password: yup
+    .required(),
+  count: yup
     .string()
-    .required()
-    .min(6, 'validation.passMin'),
-  confirmPassword: yup
+    .required(),
+  price: yup
     .string()
-    .required()
-    .oneOf([yup.ref('password')]),
+    .required(),
+  composition: yup
+    .string()
+    .required(),
+  foodValues: yup
+    .string()
+    .required(),
 });

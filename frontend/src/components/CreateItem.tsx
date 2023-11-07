@@ -10,6 +10,7 @@ import { Upload, Tooltip } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import notify from '../utilities/toast';
+import { createItemValidation } from '../validations/validations';
 import roundingEldorado from '../utilities/roundingEldorado';
 import routes from '../routes';
 
@@ -36,9 +37,10 @@ const CreateItem = () => {
       },
       discount: '',
     },
+    validationSchema: createItemValidation,
     onSubmit: async (values, { setSubmitting }) => {
       try {
-        console.log(values);
+        console.log(values, typeof values.image);
         const { data } = await axios.post(routes.createItem, values, {
           headers: {
             'Content-Type': 'multipart/form-data',
@@ -67,27 +69,40 @@ const CreateItem = () => {
     <div className="marketplace d-flex justify-content-center">
       <Form onSubmit={formik.handleSubmit} className="col-12 col-xl-4">
         <Card className="card-item">
-          <ImgCrop rotationSlider>
-            <Upload
-              className="picture-circle d-flex justify-content-center my-3"
-              listType="picture-card"
-              maxCount={1}
-              onRemove={() => {
-                formik.setFieldValue('image', '');
-              }}
-              beforeUpload={(file) => {
-                formik.setFieldValue('image', file);
-                return false;
-              }}
-            >
-              <div>
-                <PlusOutlined className="mb-2" />
-                <div>Загрузить</div>
-              </div>
-            </Upload>
-          </ImgCrop>
+          <div className="position-relative d-flex justify-content-center">
+            <ImgCrop rotationSlider>
+              <Upload
+                className="picture-circle d-flex justify-content-center my-3"
+                listType="picture-card"
+                accept="image/png"
+                maxCount={1}
+                onRemove={() => {
+                  formik.setFieldValue('image', '');
+                }}
+                beforeUpload={(file) => {
+                  if (file.type !== 'image/png') {
+                    return formik.setFieldError('image', 'You can only upload PNG file!');
+                  }
+                  const isBigFile = file.size / 1024 / 1024 > 0.2; // 200 КБ
+                  if (isBigFile) {
+                    return formik.setFieldError('image', 'Image must smaller than 200 KB!');
+                  }
+                  formik.setFieldValue('image', file);
+                  return false;
+                }}
+              >
+                <div>
+                  <PlusOutlined className="mb-2" />
+                  <div>Загрузить</div>
+                </div>
+              </Upload>
+            </ImgCrop>
+            <Form.Control.Feedback type="invalid" className={formik.errors.image && 'd-block top-84'} tooltip>
+              {formik.errors.image}
+            </Form.Control.Feedback>
+          </div>
           <Card.Body className="pt-0 d-flex flex-column">
-            <Form.Group className="mb-4" controlId="name">
+            <Form.Group className="mb-4 position-relative" controlId="name">
               <Form.Label className="visually-hidden">Item name</Form.Label>
               <Form.Control
                 size="sm"
@@ -106,7 +121,7 @@ const CreateItem = () => {
             </Form.Group>
             <Card.Text as="div">
               <div className="d-flex justify-content-between mb-3">
-                <Form.Group className="col-7" controlId="price">
+                <Form.Group className="col-7 position-relative" controlId="price">
                   <Form.Label className="visually-hidden">Price</Form.Label>
                   <InputGroup size="sm">
                     {formik.values.discountPrice
@@ -134,10 +149,10 @@ const CreateItem = () => {
                       />
                     </Tooltip>
                     <InputGroup.Text id="inputGroup-price">₽</InputGroup.Text>
+                    <Form.Control.Feedback type="invalid" tooltip>
+                      {formik.errors.price}
+                    </Form.Control.Feedback>
                   </InputGroup>
-                  <Form.Control.Feedback type="invalid" tooltip>
-                    {formik.errors.price}
-                  </Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group className="col-4" controlId="unit">
                   <Form.Label className="visually-hidden">Unit</Form.Label>
@@ -158,7 +173,7 @@ const CreateItem = () => {
                 </Form.Group>
               </div>
               <div className="d-flex justify-content-between mb-3">
-                <Form.Group className="col-7" controlId="count">
+                <Form.Group className="col-7 position-relative" controlId="count">
                   <Form.Label className="visually-hidden">Count</Form.Label>
                   <Form.Control
                     size="sm"
@@ -201,14 +216,11 @@ const CreateItem = () => {
                     />
                     <InputGroup.Text id="inputGroup-discount">%</InputGroup.Text>
                   </InputGroup>
-                  <Form.Control.Feedback type="invalid" tooltip>
-                    {formik.errors.discount}
-                  </Form.Control.Feedback>
                 </Form.Group>
               </div>
               <div className="mb-3">Пищевая ценность на 100гр:</div>
               <div className="d-flex justify-content-between mb-3">
-                <Form.Group className="col-3" controlId="carbohydrates">
+                <Form.Group className="col-3 position-relative" controlId="carbohydrates">
                   <Form.Label className="visually-hidden">Углеводы</Form.Label>
                   <Form.Control
                     size="sm"
@@ -225,7 +237,7 @@ const CreateItem = () => {
                     {formik.errors.foodValues?.carbohydrates}
                   </Form.Control.Feedback>
                 </Form.Group>
-                <Form.Group className="col-3" controlId="fats">
+                <Form.Group className="col-3 position-relative" controlId="fats">
                   <Form.Label className="visually-hidden">Жиры</Form.Label>
                   <Form.Control
                     size="sm"
@@ -242,7 +254,7 @@ const CreateItem = () => {
                     {formik.errors.foodValues?.fats}
                   </Form.Control.Feedback>
                 </Form.Group>
-                <Form.Group className="col-3" controlId="proteins">
+                <Form.Group className="col-3 position-relative" controlId="proteins">
                   <Form.Label className="visually-hidden">Белки</Form.Label>
                   <Form.Control
                     size="sm"
@@ -259,7 +271,7 @@ const CreateItem = () => {
                     {formik.errors.foodValues?.proteins}
                   </Form.Control.Feedback>
                 </Form.Group>
-                <Form.Group className="col-3" controlId="ccal">
+                <Form.Group className="col-3 position-relative" controlId="ccal">
                   <Form.Label className="visually-hidden">Ккал</Form.Label>
                   <Form.Control
                     size="sm"
@@ -277,7 +289,7 @@ const CreateItem = () => {
                   </Form.Control.Feedback>
                 </Form.Group>
               </div>
-              <Form.Group className="mb-3" controlId="composition">
+              <Form.Group className="mb-3 position-relative" controlId="composition">
                 <Form.Label className="visually-hidden">Сосав</Form.Label>
                 <Form.Control
                   size="sm"
