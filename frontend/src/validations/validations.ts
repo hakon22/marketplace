@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as yup from 'yup';
 import { setLocale } from 'yup';
 
@@ -79,7 +80,9 @@ export const createItemValidation = yup.object().shape({
     .min(3),
   image: yup
     .mixed()
-    .required(),
+    .required()
+    .test('fileType', 'You can only upload PNG file!', (file: any) => file.type === 'image/png')
+    .test('fileSize', 'Image must smaller than 200 KB!', (file: any) => file.size / 1024 / 1024 < 0.2), // 200 КБ
   unit: yup
     .string()
     .required(),
@@ -92,7 +95,18 @@ export const createItemValidation = yup.object().shape({
   composition: yup
     .string()
     .required(),
-  foodValues: yup
-    .string()
-    .required(),
+  foodValues: yup.object().shape({
+    carbohydrates: yup
+      .string()
+      .required(),
+    fats: yup
+      .string()
+      .required(),
+    proteins: yup
+      .string()
+      .required(),
+    ccal: yup
+      .string()
+      .required(),
+  }),
 });

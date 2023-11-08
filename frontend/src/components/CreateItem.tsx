@@ -4,7 +4,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useFormik } from 'formik';
 import ImgCrop from 'antd-img-crop';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { PlusOutlined } from '@ant-design/icons';
 import { Upload, Tooltip } from 'antd';
 import { useNavigate } from 'react-router-dom';
@@ -12,12 +12,14 @@ import axios from 'axios';
 import notify from '../utilities/toast';
 import { createItemValidation } from '../validations/validations';
 import roundingEldorado from '../utilities/roundingEldorado';
+import formClass from '../utilities/formClass';
 import routes from '../routes';
 
 const CreateItem = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
+  const uploadRef = useRef<HTMLDivElement>(null);
   const [isDiscount, setIsDiscount] = useState(false);
 
   const formik = useFormik({
@@ -65,11 +67,25 @@ const CreateItem = () => {
     setTimeout(() => setIsDiscount(false), 1);
   };
 
+  useEffect(() => {
+    const uploadContainer = formik.values.image
+      ? uploadRef.current?.querySelector('.ant-upload-list-item')
+      : uploadRef.current?.querySelector('.ant-upload-select');
+
+    if (formik.errors.image && formik.submitCount) {
+      setTimeout(() => {
+        uploadContainer?.classList.add('border', 'border-danger');
+      }, 300);
+    } else {
+      uploadContainer?.classList.remove('border', 'border-danger');
+    }
+  }, [formik.errors.image]);
+
   return (
     <div className="marketplace d-flex justify-content-center">
       <Form onSubmit={formik.handleSubmit} className="col-12 col-xl-4">
         <Card className="card-item">
-          <div className="position-relative d-flex justify-content-center">
+          <div ref={uploadRef} className={formik.errors.image && formik.submitCount ? 'position-relative d-flex justify-content-center mb-3' : 'position-relative d-flex justify-content-center'}>
             <ImgCrop rotationSlider>
               <Upload
                 className="picture-circle d-flex justify-content-center my-3"
@@ -80,29 +96,24 @@ const CreateItem = () => {
                   formik.setFieldValue('image', '');
                 }}
                 beforeUpload={(file) => {
-                  if (file.type !== 'image/png') {
-                    return formik.setFieldError('image', 'You can only upload PNG file!');
-                  }
-                  const isBigFile = file.size / 1024 / 1024 > 0.2; // 200 КБ
-                  if (isBigFile) {
-                    return formik.setFieldError('image', 'Image must smaller than 200 KB!');
-                  }
                   formik.setFieldValue('image', file);
                   return false;
                 }}
               >
+                {!formik.values.image && (
                 <div>
                   <PlusOutlined className="mb-2" />
                   <div>Загрузить</div>
                 </div>
+                )}
               </Upload>
             </ImgCrop>
-            <Form.Control.Feedback type="invalid" className={formik.errors.image && 'd-block top-84'} tooltip>
-              {formik.errors.image}
+            <Form.Control.Feedback type="invalid" className={formik.errors.image && formik.submitCount ? 'd-block top-84' : ''} tooltip>
+              {t(formik.errors.image)}
             </Form.Control.Feedback>
           </div>
           <Card.Body className="pt-0 d-flex flex-column">
-            <Form.Group className="mb-4 position-relative" controlId="name">
+            <Form.Group className={formClass('name', 'mb-4 position-relative', formik)} controlId="name">
               <Form.Label className="visually-hidden">Item name</Form.Label>
               <Form.Control
                 size="sm"
@@ -116,11 +127,11 @@ const CreateItem = () => {
                 placeholder="Введите название"
               />
               <Form.Control.Feedback type="invalid" tooltip>
-                {formik.errors.name}
+                {t(formik.errors.name)}
               </Form.Control.Feedback>
             </Form.Group>
             <Card.Text as="div">
-              <div className="d-flex justify-content-between mb-3">
+              <div className={formClass('price', 'd-flex justify-content-between mb-3', formik)}>
                 <Form.Group className="col-7 position-relative" controlId="price">
                   <Form.Label className="visually-hidden">Price</Form.Label>
                   <InputGroup size="sm">
@@ -150,7 +161,7 @@ const CreateItem = () => {
                     </Tooltip>
                     <InputGroup.Text id="inputGroup-price">₽</InputGroup.Text>
                     <Form.Control.Feedback type="invalid" tooltip>
-                      {formik.errors.price}
+                      {t(formik.errors.price)}
                     </Form.Control.Feedback>
                   </InputGroup>
                 </Form.Group>
@@ -172,7 +183,7 @@ const CreateItem = () => {
                   </InputGroup>
                 </Form.Group>
               </div>
-              <div className="d-flex justify-content-between mb-3">
+              <div className={formClass('count', 'd-flex justify-content-between mb-3', formik)}>
                 <Form.Group className="col-7 position-relative" controlId="count">
                   <Form.Label className="visually-hidden">Count</Form.Label>
                   <Form.Control
@@ -187,7 +198,7 @@ const CreateItem = () => {
                     placeholder="Остаток товара"
                   />
                   <Form.Control.Feedback type="invalid" tooltip>
-                    {formik.errors.count}
+                    {t(formik.errors.count)}
                   </Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group className="col-4" controlId="discount">
@@ -207,7 +218,6 @@ const CreateItem = () => {
                         return formik.setFieldValue('discount', value);
                       }}
                       onBlur={formik.handleBlur}
-                      isInvalid={!!(formik.errors.discount && formik.submitCount)}
                       autoComplete="on"
                       type="text"
                       value={formik.values.discount}
@@ -219,7 +229,7 @@ const CreateItem = () => {
                 </Form.Group>
               </div>
               <div className="mb-3">Пищевая ценность на 100гр:</div>
-              <div className="d-flex justify-content-between mb-3">
+              <div className={formik.errors.foodValues && formik.submitCount ? 'd-flex justify-content-between mb-6' : 'd-flex justify-content-between mb-3'}>
                 <Form.Group className="col-3 position-relative" controlId="carbohydrates">
                   <Form.Label className="visually-hidden">Углеводы</Form.Label>
                   <Form.Control
@@ -234,7 +244,7 @@ const CreateItem = () => {
                     placeholder="Углеводы"
                   />
                   <Form.Control.Feedback type="invalid" tooltip>
-                    {formik.errors.foodValues?.carbohydrates}
+                    {t(formik.errors.foodValues?.carbohydrates)}
                   </Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group className="col-3 position-relative" controlId="fats">
@@ -251,7 +261,7 @@ const CreateItem = () => {
                     name="foodValues.fats"
                   />
                   <Form.Control.Feedback type="invalid" tooltip>
-                    {formik.errors.foodValues?.fats}
+                    {t(formik.errors.foodValues?.fats)}
                   </Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group className="col-3 position-relative" controlId="proteins">
@@ -268,7 +278,7 @@ const CreateItem = () => {
                     name="foodValues.proteins"
                   />
                   <Form.Control.Feedback type="invalid" tooltip>
-                    {formik.errors.foodValues?.proteins}
+                    {t(formik.errors.foodValues?.proteins)}
                   </Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group className="col-3 position-relative" controlId="ccal">
@@ -285,11 +295,11 @@ const CreateItem = () => {
                     name="foodValues.ccal"
                   />
                   <Form.Control.Feedback type="invalid" tooltip>
-                    {formik.errors.foodValues?.ccal}
+                    {t(formik.errors.foodValues?.ccal)}
                   </Form.Control.Feedback>
                 </Form.Group>
               </div>
-              <Form.Group className="mb-3 position-relative" controlId="composition">
+              <Form.Group className={formClass('composition', 'mb-3 position-relative', formik)} controlId="composition">
                 <Form.Label className="visually-hidden">Сосав</Form.Label>
                 <Form.Control
                   size="sm"
@@ -304,7 +314,7 @@ const CreateItem = () => {
                   name="composition"
                 />
                 <Form.Control.Feedback type="invalid" tooltip>
-                  {formik.errors.composition}
+                  {t(formik.errors.composition)}
                 </Form.Control.Feedback>
               </Form.Group>
             </Card.Text>
