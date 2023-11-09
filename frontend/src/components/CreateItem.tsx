@@ -7,9 +7,10 @@ import ImgCrop from 'antd-img-crop';
 import { useState, useEffect, useRef } from 'react';
 import { PlusOutlined } from '@ant-design/icons';
 import { Upload, Tooltip } from 'antd';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import notify from '../utilities/toast';
+import { marketAdd } from '../slices/marketSlice';
+import { useAppDispatch } from '../utilities/hooks';
 import { createItemValidation } from '../validations/validations';
 import roundingEldorado from '../utilities/roundingEldorado';
 import formClass from '../utilities/formClass';
@@ -17,7 +18,7 @@ import routes from '../routes';
 
 const CreateItem = () => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   const uploadRef = useRef<HTMLDivElement>(null);
   const [isDiscount, setIsDiscount] = useState(false);
@@ -40,18 +41,31 @@ const CreateItem = () => {
       discount: '',
     },
     validationSchema: createItemValidation,
-    onSubmit: async (values, { setSubmitting }) => {
+    onSubmit: async (values, { resetForm }) => {
       try {
-        console.log(values, typeof values.image);
-        const { data } = await axios.post(routes.createItem, values, {
+        if (!values.discount) {
+          values.discount = '0';
+          values.discountPrice = '0';
+        }
+        const {
+          foodValues: {
+            carbohydrates, fats, proteins, ccal,
+          }, ...rest
+        } = values;
+        const { data } = await axios.post(routes.createItem, {
+          ...rest,
+          carbohydrates,
+          fats,
+          proteins,
+          ccal,
+        }, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
         });
         if (data.code === 1) {
-          navigate(routes.homePage);
-        } else if (data.code === 2) {
-          setSubmitting(false);
+          dispatch(marketAdd(data.item));
+          resetForm();
         }
       } catch (e) {
         notify(t('toast.unknownError'), 'error');
@@ -63,9 +77,11 @@ const CreateItem = () => {
   const updatePrice = () => {
     const { price, discount } = formik.values;
     const newPrice = Number(price) * (1 - Number(discount) / 100);
-    formik.setFieldValue('discountPrice', roundingEldorado(newPrice));
+    formik.setFieldValue('discountPrice', roundingEldorado(newPrice).toString());
     setTimeout(() => setIsDiscount(false), 1);
   };
+
+  const numbersFilter = (e: React.ChangeEvent<HTMLInputElement>) => formik.setFieldValue(e.target.name, e.target.value.replace(/[^\d]/g, ''));
 
   useEffect(() => {
     const uploadContainer = formik.values.image
@@ -75,18 +91,25 @@ const CreateItem = () => {
     if (formik.errors.image && formik.submitCount) {
       setTimeout(() => {
         uploadContainer?.classList.add('border', 'border-danger');
-      }, 300);
+      }, 350);
     } else {
       uploadContainer?.classList.remove('border', 'border-danger');
     }
-  }, [formik.errors.image]);
+  }, [formik.errors.image, formik.submitCount]);
 
   return (
     <div className="marketplace d-flex justify-content-center">
       <Form onSubmit={formik.handleSubmit} className="col-12 col-xl-4">
         <Card className="card-item">
           <div ref={uploadRef} className={formik.errors.image && formik.submitCount ? 'position-relative d-flex justify-content-center mb-3' : 'position-relative d-flex justify-content-center'}>
-            <ImgCrop rotationSlider>
+            <ImgCrop
+              rotationSlider
+              showReset
+              modalCancel={t('imageCrop.modalCancel')}
+              modalTitle={t('imageCrop.modalTitle')}
+              resetText={t('imageCrop.resetText')}
+              fillColor="transparent"
+            >
               <Upload
                 className="picture-circle d-flex justify-content-center my-3"
                 listType="picture-card"
@@ -96,6 +119,7 @@ const CreateItem = () => {
                   formik.setFieldValue('image', '');
                 }}
                 beforeUpload={(file) => {
+                  console.log(file.size);
                   formik.setFieldValue('image', file);
                   return false;
                 }}
@@ -103,7 +127,7 @@ const CreateItem = () => {
                 {!formik.values.image && (
                 <div>
                   <PlusOutlined className="mb-2" />
-                  <div>Загрузить</div>
+                  <div>{t('createItem.upload')}</div>
                 </div>
                 )}
               </Upload>
@@ -114,7 +138,7 @@ const CreateItem = () => {
           </div>
           <Card.Body className="pt-0 d-flex flex-column">
             <Form.Group className={formClass('name', 'mb-4 position-relative', formik)} controlId="name">
-              <Form.Label className="visually-hidden">Item name</Form.Label>
+              <Form.Label className="visually-hidden">{t('createItem.nameItem')}</Form.Label>
               <Form.Control
                 size="sm"
                 onChange={formik.handleChange}
@@ -124,7 +148,7 @@ const CreateItem = () => {
                 type="text"
                 value={formik.values.name}
                 name="name"
-                placeholder="Введите название"
+                placeholder={t('createItem.nameItem')}
               />
               <Form.Control.Feedback type="invalid" tooltip>
                 {t(formik.errors.name)}
@@ -133,17 +157,17 @@ const CreateItem = () => {
             <Card.Text as="div">
               <div className={formClass('price', 'd-flex justify-content-between mb-3', formik)}>
                 <Form.Group className="col-7 position-relative" controlId="price">
-                  <Form.Label className="visually-hidden">Price</Form.Label>
+                  <Form.Label className="visually-hidden">{t('createItem.priceItem')}</Form.Label>
                   <InputGroup size="sm">
                     {formik.values.discountPrice
                     && (
-                    <Tooltip title="Цена со скидкой" color="green" placement="top">
+                    <Tooltip title={t('createItem.tooltipPriceDiscount')} color="green" placement="top">
                       <InputGroup.Text id="inputGroup-priceOrig" className="text-success">{formik.values.discountPrice}</InputGroup.Text>
                     </Tooltip>
                     )}
-                    <Tooltip title={formik.values.discountPrice ? 'Старая цена' : ''} color="volcano" placement="topLeft">
+                    <Tooltip title={formik.values.discountPrice ? t('createItem.tooltipPriceOriginal') : ''} color="volcano" placement="topLeft">
                       <Form.Control
-                        placeholder="Цена"
+                        placeholder={t('createItem.priceItem')}
                         className={formik.values.discountPrice && 'text-danger'}
                         onChange={({ target }) => {
                           if (formik.values.discount && !isDiscount) {
@@ -159,16 +183,16 @@ const CreateItem = () => {
                         name="price"
                       />
                     </Tooltip>
-                    <InputGroup.Text id="inputGroup-price">₽</InputGroup.Text>
+                    <InputGroup.Text id="inputGroup-price">{t('createItem.rubSymbol')}</InputGroup.Text>
                     <Form.Control.Feedback type="invalid" tooltip>
                       {t(formik.errors.price)}
                     </Form.Control.Feedback>
                   </InputGroup>
                 </Form.Group>
                 <Form.Group className="col-4" controlId="unit">
-                  <Form.Label className="visually-hidden">Unit</Form.Label>
+                  <Form.Label className="visually-hidden">{t('createItem.unitItem.label')}</Form.Label>
                   <InputGroup size="sm">
-                    <InputGroup.Text id="inputGroup-discount">за</InputGroup.Text>
+                    <InputGroup.Text id="inputGroup-discount">{t('createItem.per')}</InputGroup.Text>
                     <Form.Select
                       size="sm"
                       onChange={formik.handleChange}
@@ -176,36 +200,36 @@ const CreateItem = () => {
                       value={formik.values.unit}
                       name="unit"
                     >
-                      <option value="кг">кг</option>
-                      <option value="гр">гр</option>
-                      <option value="шт">шт</option>
+                      <option value={t('createItem.unitItem.kg')}>{t('createItem.unitItem.kg')}</option>
+                      <option value={t('createItem.unitItem.gr')}>{t('createItem.unitItem.gr')}</option>
+                      <option value={t('createItem.unitItem.ea')}>{t('createItem.unitItem.ea')}</option>
                     </Form.Select>
                   </InputGroup>
                 </Form.Group>
               </div>
               <div className={formClass('count', 'd-flex justify-content-between mb-3', formik)}>
                 <Form.Group className="col-7 position-relative" controlId="count">
-                  <Form.Label className="visually-hidden">Count</Form.Label>
+                  <Form.Label className="visually-hidden">{t('createItem.countItem')}</Form.Label>
                   <Form.Control
                     size="sm"
-                    onChange={formik.handleChange}
+                    onChange={numbersFilter}
                     onBlur={formik.handleBlur}
                     isInvalid={!!(formik.errors.count && formik.submitCount)}
                     autoComplete="on"
                     type="text"
                     value={formik.values.count}
                     name="count"
-                    placeholder="Остаток товара"
+                    placeholder={t('createItem.countItem')}
                   />
                   <Form.Control.Feedback type="invalid" tooltip>
                     {t(formik.errors.count)}
                   </Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group className="col-4" controlId="discount">
-                  <Form.Label className="visually-hidden">Discount</Form.Label>
+                  <Form.Label className="visually-hidden">{t('createItem.discount')}</Form.Label>
                   <InputGroup size="sm">
                     <Form.Control
-                      placeholder="Скидка"
+                      placeholder={t('createItem.discount')}
                       onChange={({ target }) => {
                         const value = target.value.replace(/[^\d]/g, '');
                         if (!value || Number(value) === 0 || Number(value) > 99) {
@@ -228,31 +252,31 @@ const CreateItem = () => {
                   </InputGroup>
                 </Form.Group>
               </div>
-              <div className="mb-3">Пищевая ценность на 100гр:</div>
+              <div className="mb-3">{t('createItem.foodValues')}</div>
               <div className={formik.errors.foodValues && formik.submitCount ? 'd-flex justify-content-between mb-6' : 'd-flex justify-content-between mb-3'}>
                 <Form.Group className="col-3 position-relative" controlId="carbohydrates">
-                  <Form.Label className="visually-hidden">Углеводы</Form.Label>
+                  <Form.Label className="visually-hidden">{t('createItem.carbohydrates')}</Form.Label>
                   <Form.Control
                     size="sm"
-                    onChange={formik.handleChange}
+                    onChange={numbersFilter}
                     onBlur={formik.handleBlur}
                     isInvalid={!!(formik.errors.foodValues?.carbohydrates && formik.submitCount)}
                     autoComplete="on"
                     type="text"
                     value={formik.values.foodValues.carbohydrates}
                     name="foodValues.carbohydrates"
-                    placeholder="Углеводы"
+                    placeholder={t('createItem.carbohydrates')}
                   />
                   <Form.Control.Feedback type="invalid" tooltip>
                     {t(formik.errors.foodValues?.carbohydrates)}
                   </Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group className="col-3 position-relative" controlId="fats">
-                  <Form.Label className="visually-hidden">Жиры</Form.Label>
+                  <Form.Label className="visually-hidden">{t('createItem.fats')}</Form.Label>
                   <Form.Control
                     size="sm"
-                    placeholder="Жиры"
-                    onChange={formik.handleChange}
+                    placeholder={t('createItem.fats')}
+                    onChange={numbersFilter}
                     onBlur={formik.handleBlur}
                     isInvalid={!!(formik.errors.foodValues?.fats && formik.submitCount)}
                     autoComplete="on"
@@ -265,11 +289,11 @@ const CreateItem = () => {
                   </Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group className="col-3 position-relative" controlId="proteins">
-                  <Form.Label className="visually-hidden">Белки</Form.Label>
+                  <Form.Label className="visually-hidden">{t('createItem.proteins')}</Form.Label>
                   <Form.Control
                     size="sm"
-                    placeholder="Белки"
-                    onChange={formik.handleChange}
+                    placeholder={t('createItem.proteins')}
+                    onChange={numbersFilter}
                     onBlur={formik.handleBlur}
                     isInvalid={!!(formik.errors.foodValues?.proteins && formik.submitCount)}
                     autoComplete="on"
@@ -282,11 +306,11 @@ const CreateItem = () => {
                   </Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group className="col-3 position-relative" controlId="ccal">
-                  <Form.Label className="visually-hidden">Ккал</Form.Label>
+                  <Form.Label className="visually-hidden">{t('createItem.ccal')}</Form.Label>
                   <Form.Control
                     size="sm"
-                    placeholder="Ккал"
-                    onChange={formik.handleChange}
+                    placeholder={t('createItem.ccal')}
+                    onChange={numbersFilter}
                     onBlur={formik.handleBlur}
                     isInvalid={!!(formik.errors.foodValues?.ccal && formik.submitCount)}
                     autoComplete="on"
@@ -300,11 +324,11 @@ const CreateItem = () => {
                 </Form.Group>
               </div>
               <Form.Group className={formClass('composition', 'mb-3 position-relative', formik)} controlId="composition">
-                <Form.Label className="visually-hidden">Сосав</Form.Label>
+                <Form.Label className="visually-hidden">{t('createItem.composition')}</Form.Label>
                 <Form.Control
                   size="sm"
                   as="textarea"
-                  placeholder="Опишите состав"
+                  placeholder={t('createItem.composition')}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   isInvalid={!!(formik.errors.composition && formik.submitCount)}
@@ -321,22 +345,24 @@ const CreateItem = () => {
             <div className="d-flex justify-content-center">
               {isDiscount ? (
                 <Button variant="outline-success" onClick={updatePrice}>
-                  Обновить цену
+                  {t('createItem.updatePrice')}
                 </Button>
               ) : (
                 <Button variant="success" type="submit" disabled={formik.isSubmitting}>
                   {formik.isSubmitting
                     ? (
-                      <Spinner
-                        as="span"
-                        animation="border"
-                        size="sm"
-                        role="status"
-                        aria-hidden="true"
-                        variant="success"
-                      />
+                      <>
+                        <Spinner
+                          as="span"
+                          animation="border"
+                          size="sm"
+                          role="status"
+                          aria-hidden="true"
+                        />
+                        {t('createItem.adding')}
+                      </>
                     )
-                    : 'Добавить товар'}
+                    : t('createItem.addItem')}
                 </Button>
               )}
             </div>

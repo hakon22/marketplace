@@ -1,4 +1,6 @@
 import { Request, Response } from 'express';
+import path from 'path';
+import sharp from 'sharp';
 import { uploadFilesPath } from '../../server.js';
 import Items_Table from '../db/tables/Items.js';
 
@@ -28,19 +30,19 @@ class Market {
   async upload(req: Request, res: Response) {
     try {
       if (!req.files) {
-        return res.status(500).send({ code: 2 });
+        return res.status(500);
       }
       if (!Array.isArray(req.files.image)) {
         const image = req.files.image;
-        const uploadPath = `${uploadFilesPath}/${image.name}`;
+        const imageName = `${Date.now()}-${image.name.replace(/[^\w\s.]/g, '').replaceAll(' ', '')}`;
+        await sharp(image.data).png({ compressionLevel: 9, quality: 70 }).toFile(path.resolve(uploadFilesPath, imageName));
 
-        image.mv(uploadPath, (error) => {
-          if (error) {
-            return res.status(500).send(error);
-          }
-          res.send({ code: 1, image: uploadPath });
-        });
-        await Items_Table.create({ name: 'test2', image: image.name, unit: 'test', price: 99, count: 99 });
+        const {
+          carbohydrates, fats, proteins, ccal, ...rest
+        } = req.body;
+
+        const item = await Items_Table.create({ ...rest, image: imageName, foodValues: { carbohydrates, fats, proteins, ccal } });
+        res.send({ code: 1, item });
       }
     } catch (e) {
       console.log(e);

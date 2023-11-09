@@ -7,8 +7,16 @@ interface ItemsModel extends Model<InferAttributes<ItemsModel>, InferCreationAtt
   image: string;
   unit: string;
   price: number;
+  discountPrice: number;
   count: number;
   discount: number;
+  composition: string;
+  foodValues: {
+    carbohydrates: number,
+    fats: number,
+    proteins: number,
+    ccal: number,
+  },
 }
 
 const Items = db.define<ItemsModel>(
@@ -31,6 +39,14 @@ const Items = db.define<ItemsModel>(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    discountPrice: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+    },
+    composition: {
+      type: DataTypes.TEXT,
+      allowNull: false,
+    },
     count: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -40,6 +56,10 @@ const Items = db.define<ItemsModel>(
       allowNull: false,
       defaultValue: 0,
     },
+    foodValues: {
+      type: DataTypes.JSONB,
+      allowNull: false,
+    }
   },
 );
 

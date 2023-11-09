@@ -80,9 +80,9 @@ export const createItemValidation = yup.object().shape({
     .min(3),
   image: yup
     .mixed()
-    .required()
-    .test('fileType', 'You can only upload PNG file!', (file: any) => file.type === 'image/png')
-    .test('fileSize', 'Image must smaller than 200 KB!', (file: any) => file.size / 1024 / 1024 < 0.2), // 200 КБ
+    .required('validation.imageRequired')
+    .test('fileType', 'validation.imagePngType', (file: any) => file.type === 'image/png')
+    .test('fileSize', 'validation.imageNoMore200kb', (file: any) => (file.size - 40000) / 1024 / 1024 < 0.2), // ~200 КБ
   unit: yup
     .string()
     .required(),

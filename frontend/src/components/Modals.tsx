@@ -136,6 +136,7 @@ export const ModalCart = ({
       show={show}
       onHide={() => {
         onHide(true);
+        setTimeout(() => setIsSetOrder(false), 300);
         dispatch(cartRemoveAll());
       }}
       centered
@@ -151,6 +152,7 @@ export const ModalCart = ({
             variant="secondary"
             onClick={() => {
               onHide(true);
+              setTimeout(() => setIsSetOrder(false), 300);
               dispatch(cartRemoveAll());
             }}
           >
