@@ -9,10 +9,8 @@ import routes from '../routes';
 
 export const fetchItems = createAsyncThunk(
   'market/fetchItems',
-  async (token: string) => {
-    const response = await axios.get(routes.getAllItems, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+  async () => {
+    const response = await axios.get(routes.getAllItems);
     return response.data;
   },
 );

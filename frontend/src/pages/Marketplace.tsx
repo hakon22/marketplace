@@ -8,13 +8,15 @@ import { updateTokens } from '../slices/loginSlice';
 import { fetchItems, selectors } from '../slices/marketSlice';
 import { useAppDispatch, useAppSelector } from '../utilities/hooks';
 import Cart from '../components/Cart';
+import Breadcrumb from '../components/Breadcrumb';
 import type { Item } from '../types/Item';
 
 const Marketplace = () => {
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
 
-  const { refreshToken, token, loadingStatus } = useAppSelector((state) => state.login);
+  const { refreshToken } = useAppSelector((state) => state.login);
+  const { loadingStatus } = useAppSelector((state) => state.market);
   const items: Item[] = useAppSelector(selectors.selectAll);
 
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -24,18 +26,16 @@ const Marketplace = () => {
   const [showedData, setShowData] = useState<Item[]>(sortedItems.slice(0, 8));
 
   useEffect(() => {
-    if (token) {
-      const fetch = async () => {
-        const { payload } = await dispatch(fetchItems(token));
-        setShowData(payload.items.slice(0, 8));
-      };
+    const fetch = async () => {
+      const { payload } = await dispatch(fetchItems());
+      setShowData(payload.items.slice(0, 8));
+    };
 
-      fetch();
-    }
+    fetch();
   }, []);
 
   useEffect(() => {
-    if (refreshToken !== null) {
+    if (refreshToken) {
       const fetch = () => dispatch(updateTokens(refreshToken));
 
       const timeAlive = setTimeout(fetch, 595000);
@@ -45,25 +45,28 @@ const Marketplace = () => {
   }, [refreshToken]);
 
   return loadingStatus !== 'finish' ? (
-    <div className="position-absolute top-50 left-50">
+    <div className="position-absolute top-50 start-50">
       <Spinner animation="border" variant="primary" role="status" />
     </div>
   ) : (
-    <div className="col-12 my-4" ref={scrollRef}>
-      <Helmet title={t('marketplace.title')} description={t('marketplace.description')} />
-      <Cart />
-      <div className="marketplace">
-        {showedData.map((item) => <CardItem key={item.id} item={item} />)}
+    <>
+      <Breadcrumb />
+      <div className="col-12 my-4" ref={scrollRef}>
+        <Helmet title={t('marketplace.title')} description={t('marketplace.description')} />
+        <Cart />
+        <div className="marketplace">
+          {showedData.map((item) => <CardItem key={item.id} item={item} />)}
+        </div>
+        <Pagination
+          data={sortedItems}
+          showedData={showedData}
+          setShowData={setShowData}
+          rowsPerPage={8}
+          scrollRef={scrollRef}
+          loadingStatus={loadingStatus}
+        />
       </div>
-      <Pagination
-        data={sortedItems}
-        showedData={showedData}
-        setShowData={setShowData}
-        rowsPerPage={8}
-        scrollRef={scrollRef}
-        loadingStatus={loadingStatus}
-      />
-    </div>
+    </>
   );
 };
 

@@ -1,3 +1,7 @@
+body {
+  background-color: #fffbf6;
+}
+
 .anim-show {
 	opacity: 0;
 	transition: 1s;
@@ -5,9 +9,40 @@
   animation-fill-mode: forwards;
 }
 
+.navbar {
+  background-color: #fcf5df;
+}
+
 .btn > svg {
   vertical-align: -.125em;
   margin-right: 0.2em;
+}
+
+.dropdown-item > svg {
+  vertical-align: -.187em;
+  margin-right: 0.2em;
+  color: #e7ad0d;
+}
+
+.modal-bg {
+  background-color: #f8f2e3;
+
+  .form-control {
+    background-color: #fcf8f3;
+  }
+
+  .form-floating > .form-control ~ label::after {
+    background-color: #fcf8f3;
+  }
+
+  .label-bg {
+    background-color: #fcf8f3;
+  }
+
+  .modal-footer {
+    padding: 0.35em;
+    justify-content: center;
+  }
 }
 
 .mt-12 {
@@ -24,6 +59,14 @@
 
 .mb-6 {
   margin-bottom: 3.4em !important;
+}
+
+.ant-dropdown-menu-title-content > .nav-link {
+  display: inline;
+}
+
+.bs-tooltip-start {
+  z-index: 999;
 }
 
 .marketplace {
@@ -53,7 +96,18 @@
   }
 }
 
+.page-link.active, .active > .page-link {
+  background-color: #fbb37e;
+  border-color: #f98622
+}
+
+.page-link {
+  color: #f98622
+}
+
 .card-item {
+
+  background-color: #fffbf9;
 
   .card-img-top {
     width: 80%;
@@ -90,6 +144,12 @@
   max-width: 50%;
 }
 
+.nav-item.show.dropdown {
+  .dropdown-menu.show {
+    left: -100%;
+  }
+}
+
 @keyframes show {
   0% { opacity: 0; }
   100% { opacity: 1; }
@@ -101,6 +161,63 @@
 
     .input-group-sm > .form-select {
       padding-right: 0;
+    }
+  }
+
+  .navbar-toggler {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+
+    &:focus {
+      box-shadow: none;
+    }
+
+    span {
+      width: 1.2em;
+      height: 2px;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #222222;
+      transition: all 0.5s;
+
+      &:nth-of-type(1) {
+        display: none;
+      }
+  
+      &:nth-of-type(2) {
+        top: 50%;
+        transform: translate(-50%, 0%) rotate(45deg);  
+      }
+  
+      &:nth-of-type(3) {
+        top: 50%;
+        transform: translate(-50%, 0%) rotate(-45deg); 
+      }
+    }
+
+    &.collapsed {
+
+      span {
+        width: 1em;
+
+        &:nth-of-type(1) {
+          display: inline;
+        }
+
+        &:nth-of-type(2) {
+          transform: translate(-50%, 0%);
+          top: calc(50% - 9px);
+        }
+  
+        &:nth-of-type(3) {
+          transform: translate(-50%, 0%);
+          top: calc(50% + 7px);
+        }
+      }
     }
   }
 }

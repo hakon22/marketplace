@@ -1,29 +1,17 @@
 import { OverlayTrigger, Tooltip, Button } from 'react-bootstrap';
 import { Cart as Purchases } from 'react-bootstrap-icons';
-import { useState } from 'react';
+import { useContext } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ModalCart } from './Modals';
+import { ModalCart, ModalOrder } from './Modals';
+import { ModalContext, ScrollContext } from './Context';
 import { selectors } from '../slices/cartSlice';
 import { useAppSelector } from '../utilities/hooks';
 import type { PriceAndCount } from '../types/Cart';
 
 const Cart = () => {
   const { t } = useTranslation();
-
-  const scrollPx = () => window.innerWidth - document.body.clientWidth;
-  const [scrollBar, setScrollBar] = useState(scrollPx());
-  const setMarginScroll = () => {
-    const px = scrollPx();
-    if (px) {
-      setScrollBar(px - 1);
-    } else {
-      setScrollBar(px);
-    }
-  };
-
-  const [show, setShow] = useState(true);
-  const modalClose = (arg?: boolean) => setShow(!!arg);
-  const modalShow = () => setShow(true);
+  const { show, modalClose, modalShow } = useContext(ModalContext);
+  const { scrollBar } = useContext(ScrollContext);
 
   const items = Object.values(useAppSelector(selectors.selectEntities));
   const initialObject: PriceAndCount = { price: 0, count: 0 };
@@ -41,9 +29,12 @@ const Cart = () => {
       <ModalCart
         items={items}
         priceAndCount={priceAndCount}
-        show={show && !!priceAndCount.count}
+        show={show}
         onHide={modalClose}
-        setMarginScroll={setMarginScroll}
+      />
+      <ModalOrder
+        show={show}
+        onHide={modalClose}
       />
       <OverlayTrigger
         placement="left"
@@ -54,7 +45,7 @@ const Cart = () => {
           </Tooltip>
         )}
       >
-        <Button className="cart" onClick={modalShow} style={{ marginRight: scrollBar, display: priceAndCount.count ? 'unset' : 'none' }}>
+        <Button className="cart" onClick={() => modalShow('cart')} style={{ marginRight: scrollBar, display: priceAndCount.count ? 'unset' : 'none' }}>
           <Purchases />
           <span className="cart__badge">{priceAndCount.count}</span>
         </Button>

@@ -1,4 +1,5 @@
 import { createContext } from 'react';
+import type { ModalShowType, ModalCloseType } from '../types/Modal';
 
 export default createContext<{
   loggedIn: boolean,
@@ -9,4 +10,23 @@ export default createContext<{
       logIn: () => undefined,
       logOut: async () => undefined,
     });
+
 export const MobileContext = createContext<boolean>(false);
+
+export const ModalContext = createContext<{
+  show: ModalShowType,
+  modalShow:(arg?: ModalShowType) => void,
+  modalClose: (arg?: ModalCloseType) => void,
+    }>({
+      show: false,
+      modalShow: () => undefined,
+      modalClose: () => undefined,
+    });
+
+export const ScrollContext = createContext<{
+  scrollBar: number,
+  setMarginScroll:() => void,
+    }>({
+      scrollBar: 0,
+      setMarginScroll: () => undefined,
+    });

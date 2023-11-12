@@ -1,24 +1,22 @@
+/* eslint-disable max-len */
 import {
   useMemo, useState, useEffect, useCallback,
 } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  BrowserRouter, Routes, Route, Navigate,
-} from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import axios from 'axios';
 import notify from '../utilities/toast';
 import Marketplace from '../pages/Marketplace';
 import CreateItem from './CreateItem';
 import NavBar from './NavBar';
 import Page404 from '../pages/Page404';
-import Login from '../pages/Login';
-import Signup from '../pages/Signup';
 import Activation from '../pages/Activation';
-import Recovery from '../pages/Recovery';
-import AuthContext, { MobileContext } from './Context';
+import AuthContext, { MobileContext, ModalContext, ScrollContext } from './Context';
 import routes from '../routes';
 import { useAppDispatch, useAppSelector } from '../utilities/hooks';
+import type { ModalShowType, ModalCloseType } from '../types/Modal';
 import { fetchTokenStorage, removeToken } from '../slices/loginSlice';
+import { ModalLogin, ModalSignup, ModalRecovery } from './Modals';
 
 const App = () => {
   const { t } = useTranslation();
@@ -40,7 +38,24 @@ const App = () => {
     setLoggedIn(false);
   }, [dispatch, id]);
 
+  const [show, setShow] = useState<ModalShowType>(false);
+  const modalClose = (arg?: ModalCloseType) => setShow(arg || false);
+  const modalShow = (arg?: ModalShowType) => setShow(arg || false);
+
+  const scrollPx = () => window.innerWidth - document.body.clientWidth;
+  const [scrollBar, setScrollBar] = useState(scrollPx());
+  const setMarginScroll = () => {
+    const px = scrollPx();
+    if (px) {
+      setScrollBar(px - 1);
+    } else {
+      setScrollBar(px);
+    }
+  };
+
   const authServices = useMemo(() => ({ loggedIn, logIn, logOut }), [loggedIn, logOut]);
+  const modalServices = useMemo(() => ({ show, modalShow, modalClose }), [show, modalClose]);
+  const scrollServices = useMemo(() => ({ scrollBar, setMarginScroll }), [scrollBar, setMarginScroll]);
 
   useEffect(() => {
     const tokenStorage = window.localStorage.getItem('refresh_token');
@@ -87,31 +102,37 @@ const App = () => {
 
   return (
     <AuthContext.Provider value={authServices}>
-      <MobileContext.Provider value={isMobile}>
-        <BrowserRouter basename="/marketplace">
-          <NavBar />
-          <hr className="mt-0" />
-          <div className="container">
-            <div className="my-4 row d-flex justify-content-center">
-              <Routes>
-                <Route
-                  path={routes.homePage}
-                  element={loggedIn
-                    ? <Marketplace />
-                    : <Navigate to={routes.loginPage} />}
-                />
-                <Route path={routes.loginPage} element={<Login />} />
-                <Route path={routes.signupPage} element={<Signup />} />
-                <Route path={routes.activationPage} element={<Activation />} />
-                <Route path={routes.recoveryPasswordPage} element={<Recovery />} />
-                <Route path={routes.createItemPage} element={<CreateItem />} />
-                <Route path={routes.notFoundPage} element={<Page404 />} />
-              </Routes>
-            </div>
-          </div>
-          <hr className="mb-4" />
-        </BrowserRouter>
-      </MobileContext.Provider>
+      <ModalContext.Provider value={modalServices}>
+        <ScrollContext.Provider value={scrollServices}>
+          <MobileContext.Provider value={isMobile}>
+            <BrowserRouter basename="/marketplace">
+              <NavBar />
+              <ModalLogin show={show} onHide={modalClose} />
+              <ModalSignup show={show} onHide={modalClose} />
+              <ModalRecovery show={show} onHide={modalClose} />
+              <hr className="mt-0" />
+              <div className="container">
+                <div className="my-4 row d-flex justify-content-center">
+                  <Routes>
+                    <Route path={routes.homePage} element={<Marketplace />} />
+                    <Route path="/discounts" element={<Marketplace />} />
+                    <Route path="/delivery" element={<Marketplace />} />
+                    <Route path="/sweet">
+                      <Route index element={<Marketplace />} />
+                      <Route path="/sweet/iceCream" element={<Marketplace />} />
+                      <Route path="/sweet/chocolate" element={<Marketplace />} />
+                    </Route>
+                    <Route path={routes.activationPage} element={<Activation />} />
+                    <Route path={routes.createItemPage} element={<CreateItem />} />
+                    <Route path={routes.notFoundPage} element={<Page404 />} />
+                  </Routes>
+                </div>
+              </div>
+              <hr className="mb-4" />
+            </BrowserRouter>
+          </MobileContext.Provider>
+        </ScrollContext.Provider>
+      </ModalContext.Provider>
     </AuthContext.Provider>
   );
 };

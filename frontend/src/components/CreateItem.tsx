@@ -6,7 +6,7 @@ import { useFormik } from 'formik';
 import ImgCrop from 'antd-img-crop';
 import { useState, useEffect, useRef } from 'react';
 import { PlusOutlined } from '@ant-design/icons';
-import { Upload, Tooltip } from 'antd';
+import { Upload, Tooltip, UploadFile } from 'antd';
 import axios from 'axios';
 import notify from '../utilities/toast';
 import { marketAdd } from '../slices/marketSlice';
@@ -22,6 +22,7 @@ const CreateItem = () => {
 
   const uploadRef = useRef<HTMLDivElement>(null);
   const [isDiscount, setIsDiscount] = useState(false);
+  const [fileList, setFileList] = useState<UploadFile[]>();
 
   const formik = useFormik({
     initialValues: {
@@ -41,7 +42,7 @@ const CreateItem = () => {
       discount: '',
     },
     validationSchema: createItemValidation,
-    onSubmit: async (values, { resetForm }) => {
+    onSubmit: async (values, { resetForm, setFieldValue }) => {
       try {
         if (!values.discount) {
           values.discount = '0';
@@ -65,6 +66,8 @@ const CreateItem = () => {
         });
         if (data.code === 1) {
           dispatch(marketAdd(data.item));
+          setFieldValue('image', '');
+          setFileList([]);
           resetForm();
         }
       } catch (e) {
@@ -115,11 +118,15 @@ const CreateItem = () => {
                 listType="picture-card"
                 accept="image/png"
                 maxCount={1}
-                onRemove={() => {
+                fileList={fileList}
+                onChange={({ fileList: newFileList }) => {
+                  setFileList(newFileList);
+                }}
+                onRemove={(e) => {
+                  console.log(e);
                   formik.setFieldValue('image', '');
                 }}
                 beforeUpload={(file) => {
-                  console.log(file.size);
                   formik.setFieldValue('image', file);
                   return false;
                 }}

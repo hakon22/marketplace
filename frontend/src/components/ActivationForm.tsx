@@ -11,7 +11,7 @@ import {
 import { EnvelopeAt } from 'react-bootstrap-icons';
 import notify from '../utilities/toast';
 import { updateTokens } from '../slices/loginSlice';
-import { MobileContext } from './Context';
+import { MobileContext, ModalContext } from './Context';
 import ModalChangeActivationEmail from './Modals';
 import { useAppDispatch, useAppSelector } from '../utilities/hooks';
 import { activationValidation } from '../validations/validations';
@@ -24,11 +24,10 @@ const ActivationForm = ({ id }: { id: string | undefined }) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const isMobile = useContext(MobileContext);
+  const { show, modalShow } = useContext(ModalContext);
+
   const { email } = useAppSelector((state) => state.login);
   const [timer, setTimer] = useState<number>(59);
-  const [show, setShow] = useState(false);
-  const modalClose = () => setShow(false);
-  const modalShow = () => setShow(true);
 
   const repeatEmail = async () => {
     try {
@@ -95,7 +94,7 @@ const ActivationForm = ({ id }: { id: string | undefined }) => {
         alt={t('loginForm.title')}
         roundedCircle
       />
-      <ModalChangeActivationEmail id={id} email={email} show={show} onHide={modalClose} />
+      <ModalChangeActivationEmail id={id} email={email} show={show} onHide={modalShow} />
       <Form
         onSubmit={formik.handleSubmit}
         className={cn('col-12 col-md-7 mb-4', {
@@ -110,7 +109,7 @@ const ActivationForm = ({ id }: { id: string | undefined }) => {
           className="mt-1 mb-1"
           title={email ?? ''}
         >
-          <Dropdown.Item eventKey="1" onClick={modalShow}>{t('activationForm.dropMenuChange')}</Dropdown.Item>
+          <Dropdown.Item eventKey="1" onClick={() => modalShow('activation')}>{t('activationForm.dropMenuChange')}</Dropdown.Item>
         </DropdownButton>
         <div className="d-block mb-3">{t('activationForm.postConfirmCode')}</div>
         <FloatingLabel className={formClass('code', 'mb-3-5 col-lg-7 mx-auto', formik)} label={t('activationForm.code')} controlId="code">

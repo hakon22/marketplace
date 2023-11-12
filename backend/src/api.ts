@@ -20,7 +20,7 @@ router.get(`${apiPath}/activation/:id`, Activation.needsActivation);
 router.get(`${apiPath}/activation/repeatEmail/:id`, Activation.repeatEmail);
 router.post(`${apiPath}/activation/changeEmail`, Activation.changeEmail);
 
-router.get(`${apiPath}/market/getAll`, passport.authenticate('jwt', { session: false }), Market.getAll);
+router.get(`${apiPath}/market/getAll`, Market.getAll);
 router.post(`${apiPath}/market/upload`, Market.upload);
 router.post(`${apiPath}/market/create`, Market.create);
 

@@ -2,7 +2,28 @@ export default {
   translation: {
     navBar: {
       title: 'Маркетплейс',
+      search: 'Поиск',
+      menu: {
+        discounts: 'Акции',
+        delivery: 'Доставка',
+        catalog: 'Каталог',
+        vegetables: 'Овощи',
+        fruits: 'Фрукты',
+        frozen: 'Заморозка',
+        freshMeat: 'Свежее мясо',
+        dairy: 'Молочные продукты',
+        fish: 'Рыба',
+        sweet: 'Сладкое',
+        iceCream: 'Мороженое',
+        chocolate: 'Шоколад',
+      },
+    },
+    profileButton: {
+      login: 'Войти',
+      signup: 'Регистрация',
       exit: 'Выйти',
+      profile: 'Личный кабинет',
+      myOrders: 'Мои заказы',
     },
     loginForm: {
       title: 'Вход',
@@ -131,7 +152,7 @@ export default {
       },
     },
     cart: {
-      summ: '= {{ price }},00 ₽',
+      summ: '{{ price }},00 ₽',
     },
     cardItem: {
       price: '{{ price }},00 ₽',

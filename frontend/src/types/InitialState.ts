@@ -7,5 +7,6 @@ export type InitialStateType = {
   token?: string;
   refreshToken?: string;
   email?: string;
+  username?: string;
   [key: string]: string | number | null | undefined;
 }

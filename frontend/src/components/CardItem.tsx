@@ -8,7 +8,7 @@ import {
 } from '../slices/cartSlice';
 import { useAppDispatch, useAppSelector } from '../utilities/hooks';
 import fetchImage from '../utilities/fetchImage';
-import type { CardItemProps } from '../types/Props';
+import type { CardItemProps } from '../types/Item';
 
 const CardItem = ({ item }: CardItemProps) => {
   const {
