@@ -1,19 +1,36 @@
+/* eslint-disable react/jsx-closing-tag-location */
 import { useTranslation } from 'react-i18next';
-import { useContext } from 'react';
-import { Link } from 'react-router-dom';
-import { Dropdown } from 'antd';
+import { useContext, useEffect, useState } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Dropdown, Select } from 'antd';
 import type { MenuProps } from 'antd';
 import cn from 'classnames';
+import { toLower } from 'lodash';
 import {
-  Navbar, Container, Button, Form, Nav,
+  Navbar, Container, Button, Nav,
 } from 'react-bootstrap';
 import ProfileButton from './ProfileButton';
+import fetchImage from '../utilities/fetchImage';
+import { useAppSelector, useAppDispatch } from '../utilities/hooks';
+import { selectors, searchUpdate } from '../slices/marketSlice';
 import { MobileContext } from './Context';
 import routes from '../routes';
+import type { Item } from '../types/Item';
 
 const NavBar = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const isMobile = useContext(MobileContext);
+  const dispatch = useAppDispatch();
+
+  const [search, setSearch] = useState<string>();
+  const [data, setData] = useState<{ name: string, image: string }[]>([]);
+
+  const [urlParams] = useSearchParams();
+  const urlPage = Number(urlParams.get('page'));
+  const urlSearch = urlParams.get('q');
+
+  const itemsMarket: Item[] = useAppSelector(selectors.selectAll);
 
   const items: MenuProps['items'] = [
     {
@@ -56,6 +73,42 @@ const NavBar = () => {
     },
   ];
 
+  console.log(search);
+  console.log(urlSearch);
+
+  const searchHandler = (searchedValue: string | undefined) => {
+    console.log(searchedValue);
+    if (!searchedValue) {
+      dispatch(searchUpdate(null));
+    } else {
+      const result = itemsMarket.filter(({ name, composition }) => {
+        const query = toLower(searchedValue);
+        return toLower(name).includes(query) || toLower(composition).includes(query);
+      });
+      if (result.length) {
+        dispatch(searchUpdate(result));
+        navigate(`/?q=${searchedValue}&page=${urlPage}`);
+        console.log(searchedValue);
+        setSearch(searchedValue);
+      } else {
+        dispatch(searchUpdate(null));
+        navigate(`/search?q=${searchedValue}`);
+      }
+      const target = document.body;
+      target.parentElement?.focus();
+    }
+  };
+
+  const handleChange = (value: string) => setSearch(value);
+
+  useEffect(() => {
+    if (urlSearch && itemsMarket.length) {
+      searchHandler(urlSearch);
+    } else {
+      setSearch(undefined);
+    }
+  }, [itemsMarket, urlSearch]);
+
   return (
     <Navbar expand={isMobile ? 'xxl' : true}>
       <Container>
@@ -78,16 +131,50 @@ const NavBar = () => {
           </Nav>
         </Navbar.Collapse>
         <Navbar.Collapse className="justify-content-end">
-          <Form className={isMobile ? 'd-flex mt-2' : 'd-flex me-5'}>
-            <Form.Control
-              type="search"
-              size="sm"
-              placeholder={t('navBar.search')}
-              className="me-2"
-              aria-label={t('navBar.search')}
-            />
-            <Button variant="outline-warning" size="sm">{t('navBar.search')}</Button>
-          </Form>
+          <Select
+            showSearch
+            value={search}
+            className="w-75 me-3"
+            placeholder={t('navBar.search')}
+            onInputKeyDown={async (e) => {
+              if (e.key === 'Enter') {
+                console.log(search);
+                searchHandler(search);
+              }
+            }}
+            filterOption={false}
+            onSearch={async (q) => {
+              const images: string[] = [];
+              const result = itemsMarket.filter(({ name, composition, image }) => {
+                const query = toLower(q);
+                images.push(image);
+                return toLower(name).includes(query) || toLower(composition).includes(query);
+              });
+              const fetchedData = await Promise.all(result.map(async ({ name, image }) => {
+                const fetchedImage = await fetchImage(image);
+                return { name, image: fetchedImage };
+              }));
+              setData(fetchedData);
+              console.log(search, q);
+              setSearch(urlSearch ?? undefined);
+            }}
+            autoClearSearchValue={false}
+            onClear={() => console.log(search)}
+            options={(data || []).map(({ name, image }) => ({
+              label: <Button
+                onClick={() => {
+                  searchHandler(name);
+                }}
+                className="ant-select-item ant-select-item-option ant-select-item-option-active"
+                title={name}
+              >
+                <div className="ant-select-item-option-content d-flex align-items-center gap-2">
+                  <img className="col-2" alt={name} src={image} />
+                  <span className="fs-6">{name}</span>
+                </div>
+              </Button>,
+            }))}
+          />
         </Navbar.Collapse>
         {!isMobile && <ProfileButton />}
       </Container>

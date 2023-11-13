@@ -5,11 +5,12 @@ import type { PaginationProps } from '../types/Pagination';
 import type { Item } from '../types/Item';
 
 const Pagination = ({
-  data, showedData, setShowData, rowsPerPage, scrollRef, loadingStatus, searchId,
+  data, setShowData, rowsPerPage, scrollRef, search,
 }: PaginationProps<Item[]>) => {
   const navigate = useNavigate();
   const [urlParams] = useSearchParams();
   const urlPage = Number(urlParams.get('page'));
+  const urlSearch = urlParams.get('q');
 
   const lastPage = Math.ceil(data.length / rowsPerPage);
 
@@ -24,7 +25,11 @@ const Pagination = ({
     const firstIndex = pageIndex * rowsPerPage;
     const lastIndex = pageIndex * rowsPerPage + rowsPerPage;
     setShowData(data.slice(firstIndex, lastIndex));
-    navigate(`?page=${page}`);
+    if (urlSearch) {
+      navigate(`?q=${urlSearch}&page=${page}`);
+    } else {
+      navigate(`?page=${page}`);
+    }
   };
 
   const items: JSX.Element[] = [];
@@ -43,28 +48,15 @@ const Pagination = ({
 
   useEffect(() => {
     if (pageParams > 1) {
-      handleClick(pageParams);
+      setTimeout(() => handleClick(pageParams), 1);
+    } else {
+      setTimeout(() => handleClick(1), 1);
     }
-  }, [pageParams]);
-
-  useEffect(() => {
-    if (loadingStatus === 'finish' && !showedData.length) {
-      if ((paramsCheck(pageParams) === 1 && urlPage !== 1) || !urlPage) {
-        navigate('?page=1');
-      }
-      handleClick(pageParams);
-    }
-  }, [loadingStatus]);
+  }, [pageParams, search]);
 
   useEffect(() => {
     scrollRef.current?.scrollIntoView();
   }, [currentPage]);
-
-  useEffect(() => {
-    if (searchId || searchId === 0) {
-      handleClick(1);
-    }
-  }, [searchId]);
 
   return <BootstrapPagination className="d-flex justify-content-center align-items-center mt-5">{items}</BootstrapPagination>;
 };

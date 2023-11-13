@@ -5,6 +5,7 @@ export type Cart = {
   unit: string;
   count: number;
   image: string;
+  discountPrice?: number;
 }
 
 export type PriceAndCount = {

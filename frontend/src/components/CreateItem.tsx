@@ -140,7 +140,7 @@ const CreateItem = () => {
               </Upload>
             </ImgCrop>
             <Form.Control.Feedback type="invalid" className={formik.errors.image && formik.submitCount ? 'd-block top-84' : ''} tooltip>
-              {t(formik.errors.image)}
+              {t(formik.errors.image ?? '')}
             </Form.Control.Feedback>
           </div>
           <Card.Body className="pt-0 d-flex flex-column">
@@ -158,7 +158,7 @@ const CreateItem = () => {
                 placeholder={t('createItem.nameItem')}
               />
               <Form.Control.Feedback type="invalid" tooltip>
-                {t(formik.errors.name)}
+                {t(formik.errors.name ?? '')}
               </Form.Control.Feedback>
             </Form.Group>
             <Card.Text as="div">
@@ -192,7 +192,7 @@ const CreateItem = () => {
                     </Tooltip>
                     <InputGroup.Text id="inputGroup-price">{t('createItem.rubSymbol')}</InputGroup.Text>
                     <Form.Control.Feedback type="invalid" tooltip>
-                      {t(formik.errors.price)}
+                      {t(formik.errors.price ?? '')}
                     </Form.Control.Feedback>
                   </InputGroup>
                 </Form.Group>
@@ -229,7 +229,7 @@ const CreateItem = () => {
                     placeholder={t('createItem.countItem')}
                   />
                   <Form.Control.Feedback type="invalid" tooltip>
-                    {t(formik.errors.count)}
+                    {t(formik.errors.count ?? '')}
                   </Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group className="col-4" controlId="discount">
@@ -275,7 +275,7 @@ const CreateItem = () => {
                     placeholder={t('createItem.carbohydrates')}
                   />
                   <Form.Control.Feedback type="invalid" tooltip>
-                    {t(formik.errors.foodValues?.carbohydrates)}
+                    {t(formik.errors.foodValues?.carbohydrates ?? '')}
                   </Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group className="col-3 position-relative" controlId="fats">
@@ -292,7 +292,7 @@ const CreateItem = () => {
                     name="foodValues.fats"
                   />
                   <Form.Control.Feedback type="invalid" tooltip>
-                    {t(formik.errors.foodValues?.fats)}
+                    {t(formik.errors.foodValues?.fats ?? '')}
                   </Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group className="col-3 position-relative" controlId="proteins">
@@ -309,7 +309,7 @@ const CreateItem = () => {
                     name="foodValues.proteins"
                   />
                   <Form.Control.Feedback type="invalid" tooltip>
-                    {t(formik.errors.foodValues?.proteins)}
+                    {t(formik.errors.foodValues?.proteins ?? '')}
                   </Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group className="col-3 position-relative" controlId="ccal">
@@ -326,7 +326,7 @@ const CreateItem = () => {
                     name="foodValues.ccal"
                   />
                   <Form.Control.Feedback type="invalid" tooltip>
-                    {t(formik.errors.foodValues?.ccal)}
+                    {t(formik.errors.foodValues?.ccal ?? '')}
                   </Form.Control.Feedback>
                 </Form.Group>
               </div>
@@ -345,7 +345,7 @@ const CreateItem = () => {
                   name="composition"
                 />
                 <Form.Control.Feedback type="invalid" tooltip>
-                  {t(formik.errors.composition)}
+                  {t(formik.errors.composition ?? '')}
                 </Form.Control.Feedback>
               </Form.Group>
             </Card.Text>

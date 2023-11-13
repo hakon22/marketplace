@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { useEffect, useRef, useState } from 'react';
 import { Spinner } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
@@ -15,20 +16,22 @@ const Marketplace = () => {
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
 
+  const showedItemsCount: number = 8;
+
   const { refreshToken } = useAppSelector((state) => state.login);
-  const { loadingStatus } = useAppSelector((state) => state.market);
+  const { loadingStatus, search } = useAppSelector((state) => state.market);
   const items: Item[] = useAppSelector(selectors.selectAll);
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const sortedItems: Item[] = items.sort((a, b) => a.id - b.id);
+  const sortedItems: Item[] = (search && [...search].sort((a, b) => a.id - b.id)) || items.sort((a, b) => a.id - b.id);
 
-  const [showedData, setShowData] = useState<Item[]>(sortedItems.slice(0, 8));
+  const [showedData, setShowData] = useState<Item[]>(sortedItems.slice(0, showedItemsCount));
 
   useEffect(() => {
     const fetch = async () => {
       const { payload } = await dispatch(fetchItems());
-      setShowData(payload.items.slice(0, 8));
+      setShowData(payload.items.slice(0, showedItemsCount));
     };
 
     fetch();
@@ -44,6 +47,12 @@ const Marketplace = () => {
     return undefined;
   }, [refreshToken]);
 
+  useEffect(() => {
+    if (search) {
+      setShowData(search.slice(0, showedItemsCount));
+    }
+  }, [search]);
+
   return loadingStatus !== 'finish' ? (
     <div className="position-absolute top-50 start-50">
       <Spinner animation="border" variant="primary" role="status" />
@@ -54,16 +63,15 @@ const Marketplace = () => {
       <div className="col-12 my-4" ref={scrollRef}>
         <Helmet title={t('marketplace.title')} description={t('marketplace.description')} />
         <Cart />
-        <div className="marketplace">
+        <div className="marketplace anim-show">
           {showedData.map((item) => <CardItem key={item.id} item={item} />)}
         </div>
         <Pagination
           data={sortedItems}
-          showedData={showedData}
           setShowData={setShowData}
-          rowsPerPage={8}
+          rowsPerPage={showedItemsCount}
           scrollRef={scrollRef}
-          loadingStatus={loadingStatus}
+          search={search}
         />
       </div>
     </>

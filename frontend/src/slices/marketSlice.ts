@@ -17,7 +17,8 @@ export const fetchItems = createAsyncThunk(
 
 export const marketAdapter = createEntityAdapter<Item>();
 
-export const initialState: InitialStateType = {
+export const initialState: InitialStateType & { search: Item[] | null } = {
+  search: null,
   loadingStatus: 'idle',
   error: null,
 };
@@ -30,6 +31,9 @@ const marketSlice = createSlice({
   reducers: {
     marketAdd: marketAdapter.addOne,
     marketUpdate: marketAdapter.updateOne,
+    searchUpdate: (state, { payload }: PayloadAction<Item[] | null>) => {
+      state.search = payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -52,7 +56,7 @@ const marketSlice = createSlice({
   },
 });
 
-export const { marketAdd, marketUpdate } = marketSlice.actions;
+export const { marketAdd, marketUpdate, searchUpdate } = marketSlice.actions;
 
 export const selectors = marketAdapter.getSelectors<RootState>((state) => state.market);
 

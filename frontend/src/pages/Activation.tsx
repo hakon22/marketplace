@@ -37,7 +37,7 @@ const Activation = () => {
     : continueActivation ? (
       <div className="col-12 col-md-8">
         <Helmet title={t('activationForm.title')} description={t('activationForm.submit')} />
-        <Card border="secondary" bg="light" className="text-center">
+        <Card border="secondary" className="text-center card-bg">
           <Card.Header className="h4">{t('activationForm.title')}</Card.Header>
           <Card.Body>
             <ActivationForm id={id} />

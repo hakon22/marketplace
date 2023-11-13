@@ -35,7 +35,7 @@ const CardItem = ({ item }: CardItemProps) => {
 
   return (
     <Card className="card-item">
-      <Card.Img variant="top" className="mx-auto" src={srcImage} />
+      <Card.Img variant="top" className="mx-auto" src={srcImage} alt={name} />
       <Card.Body className="pt-0">
         <Rate disabled defaultValue={4.5} />
         <div className="d-flex justify-content-between align-items-center mb-3">

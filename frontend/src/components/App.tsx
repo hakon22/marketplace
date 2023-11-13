@@ -17,6 +17,7 @@ import { useAppDispatch, useAppSelector } from '../utilities/hooks';
 import type { ModalShowType, ModalCloseType } from '../types/Modal';
 import { fetchTokenStorage, removeToken } from '../slices/loginSlice';
 import { ModalLogin, ModalSignup, ModalRecovery } from './Modals';
+import Search from '../pages/Search';
 
 const App = () => {
   const { t } = useTranslation();
@@ -26,6 +27,7 @@ const App = () => {
   const {
     id, token, refreshToken, error,
   } = useAppSelector((state) => state.login);
+
   const [loggedIn, setLoggedIn] = useState(false);
   const logIn = () => setLoggedIn(true);
   const logOut = useCallback(async () => {
@@ -122,6 +124,7 @@ const App = () => {
                       <Route path="/sweet/iceCream" element={<Marketplace />} />
                       <Route path="/sweet/chocolate" element={<Marketplace />} />
                     </Route>
+                    <Route path="/search" element={<Search />} />
                     <Route path={routes.activationPage} element={<Activation />} />
                     <Route path={routes.createItemPage} element={<CreateItem />} />
                     <Route path={routes.notFoundPage} element={<Page404 />} />

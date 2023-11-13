@@ -128,7 +128,7 @@ const ActivationForm = ({ id }: { id: string | undefined }) => {
             placeholder={t('activationForm.code')}
           />
           <Form.Control.Feedback type="invalid" tooltip className="anim-show">
-            {t(formik.errors.code)}
+            {t(formik.errors.code ?? '')}
           </Form.Control.Feedback>
         </FloatingLabel>
         { timer

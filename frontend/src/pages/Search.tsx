@@ -3,27 +3,24 @@ import { Helmet } from 'react-helmet';
 import { Card, Image } from 'react-bootstrap';
 import lemon from '../images/lemon.svg';
 
-const Page404 = () => {
+const Search = () => {
   const { t } = useTranslation();
   return (
     <div className="col-12 col-md-8">
       <Helmet>
-        <title>{t('404.header')}</title>
-        <meta name="description" content={t('404.title')} />
+        <title>{t('search.header')}</title>
+        <meta name="description" content={t('search.title')} />
         <link rel="canonical" href={window.location.href} />
       </Helmet>
       <Card border="warning" className="text-center card-bg">
-        <Card.Header>{t('404.header')}</Card.Header>
+        <Card.Header>{t('search.header')}</Card.Header>
         <Card.Body>
-          <Image className="mt-3 mb-4" src={lemon} alt={t('404.header')} roundedCircle />
-          <Card.Title>{t('404.title')}</Card.Title>
-          <Card.Text>
-            {t('404.text')}
-          </Card.Text>
+          <Image className="mt-3 mb-4" src={lemon} alt={t('search.header')} roundedCircle />
+          <Card.Title>{t('search.title')}</Card.Title>
         </Card.Body>
       </Card>
     </div>
   );
 };
 
-export default Page404;
+export default Search;

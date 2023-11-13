@@ -7,13 +7,13 @@ const Breadcrumb = () => {
   const { t } = useTranslation();
   const { pathname } = window.location;
 
-  const [breadcrumb, setBreadcrumb] = useState<{ title: JSX.Element | string }[]>([]);
+  const [breadcrumbs, setBreadcrumbs] = useState<{ title: JSX.Element | string }[]>([]);
 
   useEffect(() => {
     const pathArray = pathname.slice(1).split('/');
     const linkArray: string[] = [];
 
-    setBreadcrumb(pathArray.map((folder, index) => {
+    setBreadcrumbs(pathArray.map((folder, index) => {
       if (pathArray.length === 1) {
         return {
           title: '',
@@ -27,17 +27,17 @@ const Breadcrumb = () => {
       linkArray.push(folder);
       if (pathArray.length - 1 === index) {
         return {
-          title: t(`navBar.menu.${[folder]}`),
+          title: t(`navBar.menu.${folder}`),
         };
       }
       const link = linkArray.reduce((acc, fold) => `${acc}/${fold}`, '');
       return {
-        title: <Link to={link}>{t(`navBar.menu.${[folder]}`)}</Link>,
+        title: <Link to={link}>{t(`navBar.menu.${folder}`)}</Link>,
       };
     }));
   }, [pathname]);
 
-  return <BreadcrumbAntd items={breadcrumb} />;
+  return <BreadcrumbAntd items={breadcrumbs} />;
 };
 
 export default Breadcrumb;

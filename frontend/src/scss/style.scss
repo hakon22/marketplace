@@ -24,12 +24,22 @@ body {
   color: #e7ad0d;
 }
 
+.form-control, .form-control:focus, .modal-bg  .form-control {
+  background-color: #fcf8f3;
+}
+
+.ant-select-dropdown .ant-select-item {
+  padding: 5px 8px;
+  border: none;
+  text-decoration: none;
+
+  &:hover {
+    color: inherit;
+  }
+}
+
 .modal-bg {
   background-color: #f8f2e3;
-
-  .form-control {
-    background-color: #fcf8f3;
-  }
 
   .form-floating > .form-control ~ label::after {
     background-color: #fcf8f3;
@@ -150,6 +160,10 @@ body {
   }
 }
 
+.card-bg {
+  background-color: #faefe2;
+}
+
 @keyframes show {
   0% { opacity: 0; }
   100% { opacity: 1; }
@@ -175,7 +189,7 @@ body {
     }
 
     span {
-      width: 1.2em;
+      width: 1.1em;
       height: 2px;
       position: absolute;
       top: 50%;
@@ -184,25 +198,20 @@ body {
       background-color: #222222;
       transition: all 0.5s;
 
-      &:nth-of-type(1) {
-        display: none;
-      }
-  
       &:nth-of-type(2) {
-        top: 50%;
-        transform: translate(-50%, 0%) rotate(45deg);  
+        transform: translate(-50%, 0%);
+        top: calc(50% - 9px);
       }
-  
+
       &:nth-of-type(3) {
-        top: 50%;
-        transform: translate(-50%, 0%) rotate(-45deg); 
+        transform: translate(-50%, 0%);
+        top: calc(50% + 7px);
       }
     }
 
     &.collapsed {
 
       span {
-        width: 1em;
 
         &:nth-of-type(1) {
           display: inline;
@@ -210,12 +219,12 @@ body {
 
         &:nth-of-type(2) {
           transform: translate(-50%, 0%);
-          top: calc(50% - 9px);
+          top: calc(50% - 6px);
         }
   
         &:nth-of-type(3) {
           transform: translate(-50%, 0%);
-          top: calc(50% + 7px);
+          top: calc(50% + 4px);
         }
       }
     }

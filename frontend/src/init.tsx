@@ -9,9 +9,13 @@ const init = async () => {
   await i18n
     .use(initReactI18next)
     .init({
+      returnNull: false,
       lng: 'ru',
       resources,
       fallbackLng: 'ru',
+      interpolation: {
+        escapeValue: false,
+      },
     });
 
   return (

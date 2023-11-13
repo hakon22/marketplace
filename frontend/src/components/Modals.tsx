@@ -94,7 +94,7 @@ const ModalChangeActivationEmail = ({
               name="email"
             />
             <Form.Control.Feedback type="invalid" tooltip className="anim-show">
-              {t(formik.errors.email)}
+              {t(formik.errors.email ?? '')}
             </Form.Control.Feedback>
           </Form.Group>
           <div className="d-flex justify-content-end">
@@ -195,10 +195,10 @@ export const ModalRecovery = ({ onHide, show }: ModalProps) => {
                 placeholder={t('signupForm.email')}
               />
               <Form.Control.Feedback type="invalid" tooltip className="anim-show">
-                {t(formik.errors.email)}
+                {t(formik.errors.email ?? '')}
               </Form.Control.Feedback>
             </FloatingLabel>
-            <Button variant="outline-warning" className="w-100" type="submit" disabled={formik.isSubmitting}>
+            <Button variant="warning" className="w-100" type="submit" disabled={formik.isSubmitting}>
               {formik.isSubmitting ? (
                 <Spinner
                   as="span"
@@ -295,7 +295,7 @@ export const ModalLogin = ({ onHide, show }: ModalProps) => {
               placeholder={t('loginForm.phone')}
             />
             <Form.Control.Feedback type="invalid" tooltip className="anim-show">
-              {t(formik.errors.phone)}
+              {t(formik.errors.phone ?? '')}
             </Form.Control.Feedback>
           </FloatingLabel>
 
@@ -312,7 +312,7 @@ export const ModalLogin = ({ onHide, show }: ModalProps) => {
               placeholder={t('loginForm.password')}
             />
             <Form.Control.Feedback type="invalid" tooltip className="anim-show">
-              {t(formik.errors.password)}
+              {t(formik.errors.password ?? '')}
             </Form.Control.Feedback>
           </FloatingLabel>
           {formik.submitCount > 2 && (
@@ -339,7 +339,7 @@ export const ModalLogin = ({ onHide, show }: ModalProps) => {
             name="save"
             label={t('loginForm.checkbox')}
           />
-          <Button variant="outline-warning" className="w-100" type="submit" disabled={formik.isSubmitting}>
+          <Button variant="warning" className="w-100" type="submit" disabled={formik.isSubmitting}>
             {formik.isSubmitting ? (
               <Spinner
                 as="span"
@@ -443,12 +443,12 @@ export const ModalSignup = ({ onHide, show }: ModalProps) => {
                   placeholder={t(`signupForm.${[key]}`)}
                 />
                 <Form.Control.Feedback type="invalid" tooltip className="anim-show">
-                  {t(formik.errors[key])}
+                  {t(formik.errors[key] ?? '')}
                 </Form.Control.Feedback>
               </FloatingLabel>
             );
           })}
-          <Button variant="outline-warning" className="w-100" type="submit" disabled={formik.isSubmitting}>
+          <Button variant="warning" className="w-100" type="submit" disabled={formik.isSubmitting}>
             {formik.isSubmitting ? (
               <Spinner
                 as="span"
