@@ -2,7 +2,7 @@
 import { useTranslation } from 'react-i18next';
 import { useContext, useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Dropdown, Select } from 'antd';
+import { Dropdown, Select, AutoComplete } from 'antd';
 import type { MenuProps } from 'antd';
 import cn from 'classnames';
 import { toLower } from 'lodash';
@@ -112,7 +112,7 @@ const NavBar = () => {
   return (
     <Navbar expand={isMobile ? 'xxl' : true}>
       <Container>
-        <Navbar.Text className="me-5">
+        <Navbar.Text className="me-5 col-2">
           <Link className="navbar-brand" to={routes.homePage}>{t('navBar.title')}</Link>
         </Navbar.Text>
         {isMobile && <ProfileButton className="ms-4" />}
@@ -121,7 +121,7 @@ const NavBar = () => {
           <span />
           <span />
         </Navbar.Toggle>
-        <Navbar.Collapse className="justify-content-start">
+        <Navbar.Collapse className="justify-content-start col-5">
           <Nav className={isMobile ? '' : 'gap-3'}>
             <Link className="nav-link" to="/discounts">{t('navBar.menu.discounts')}</Link>
             <Link className="nav-link" to="/delivery">{t('navBar.menu.delivery')}</Link>
@@ -130,36 +130,11 @@ const NavBar = () => {
             </Dropdown>
           </Nav>
         </Navbar.Collapse>
-        <Navbar.Collapse className="justify-content-end">
-          <Select
-            showSearch
-            value={search}
-            className="w-75 me-3"
+        <Navbar.Collapse className="justify-content-end col-4 me-3">
+          <AutoComplete
+            className="w-100"
             placeholder={t('navBar.search')}
-            onInputKeyDown={async (e) => {
-              if (e.key === 'Enter') {
-                console.log(search);
-                searchHandler(search);
-              }
-            }}
-            filterOption={false}
-            onSearch={async (q) => {
-              const images: string[] = [];
-              const result = itemsMarket.filter(({ name, composition, image }) => {
-                const query = toLower(q);
-                images.push(image);
-                return toLower(name).includes(query) || toLower(composition).includes(query);
-              });
-              const fetchedData = await Promise.all(result.map(async ({ name, image }) => {
-                const fetchedImage = await fetchImage(image);
-                return { name, image: fetchedImage };
-              }));
-              setData(fetchedData);
-              console.log(search, q);
-              setSearch(urlSearch ?? undefined);
-            }}
-            autoClearSearchValue={false}
-            onClear={() => console.log(search)}
+            allowClear
             options={(data || []).map(({ name, image }) => ({
               label: <Button
                 onClick={() => {
@@ -174,9 +149,23 @@ const NavBar = () => {
                 </div>
               </Button>,
             }))}
+            onSearch={async (q) => {
+              const images: string[] = [];
+              const result = itemsMarket.filter(({ name, composition, image }) => {
+                const query = toLower(q);
+                images.push(image);
+                return toLower(name).includes(query) || toLower(composition).includes(query);
+              });
+              const fetchedData = await Promise.all(result.map(async ({ name, image }) => {
+                const fetchedImage = await fetchImage(image);
+                return { name, image: fetchedImage };
+              }));
+              setData(fetchedData);
+            }}
+            status="warning"
           />
         </Navbar.Collapse>
-        {!isMobile && <ProfileButton />}
+        {!isMobile && <ProfileButton className="col-1" />}
       </Container>
     </Navbar>
   );
