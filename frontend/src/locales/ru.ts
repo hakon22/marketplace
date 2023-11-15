@@ -145,6 +145,7 @@ export default {
         remove: 'Удалить',
         price: '{{ price }},00 ₽',
         summ: 'Сумма: {{ price }},00 ₽',
+        discount: 'Скидка {{ discount }},00 ₽',
         sendOrder: 'Отправить заказ',
         clearCart: 'Очистить корзину',
         orderAccept: 'Заказ принят!',
@@ -159,6 +160,7 @@ export default {
       subtitle: '{{ price }},00 ₽/{{ unit }}',
       addToCart: 'В корзину',
       inCart: 'В корзине',
+      discount: '-{{ discount }}%',
     },
     search: {
       header: 'Ничего не найдено',

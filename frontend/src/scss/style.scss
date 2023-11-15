@@ -91,18 +91,8 @@ body {
     }
   }
 
-  .old-price {
-    position: relative;
-    font-size: 40px;
-
-    &:before {
-      border-bottom: 3px solid red;
-      position: absolute;
-      content: "";
-      width: 100%;
-      height: 50%;
-      transform: rotate(-7deg);
-    }
+  .price > .discount {
+    text-decoration: line-through;
   }
 }
 
@@ -119,9 +109,12 @@ body {
 
   background-color: #fffbf9;
 
-  .card-img-top {
+  .card-image {
     width: 80%;
-    height: 48.16%;
+
+    .card-img-top {
+      width: 100%;
+    }
   }
 
   &:hover {
@@ -166,7 +159,7 @@ body {
  @media (max-width: 768px) {
 
   .marketplace {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(1, 1fr);
 
     .input-group-sm > .form-select {
       padding-right: 0;

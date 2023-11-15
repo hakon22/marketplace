@@ -9,6 +9,7 @@ import {
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useFormik } from 'formik';
+import { Badge, Tooltip } from 'antd';
 import axios from 'axios';
 import { toLower, capitalize } from 'lodash';
 import { useAppDispatch } from '../utilities/hooks';
@@ -512,7 +513,7 @@ export const ModalCart = ({
           {items.map((item) => {
             if (item) {
               const {
-                id, name, price, count, image, unit,
+                id, name, price, discountPrice, count, image, unit,
               } = item;
               return (
                 <div key={id} className="row d-flex justify-content-between align-items-center">
@@ -539,7 +540,7 @@ export const ModalCart = ({
                       }}
                     />
                   </span>
-                  <span className="col-5 col-xl-3 fs-6">{t('modal.cart.price', { price: price * count })}</span>
+                  <span className="col-5 col-xl-3 fs-6">{t('modal.cart.price', { price: (discountPrice || price) * count })}</span>
                   <span className="col-2 col-xl-1 d-flex align-items-center">
                     <XCircle
                       role="button"
@@ -570,9 +571,13 @@ export const ModalCart = ({
               {t('modal.cart.clearCart')}
             </Button>
           </div>
-          <span className="text-end fw-bolder fs-6">
-            {t('modal.cart.summ', { price: priceAndCount.price })}
-          </span>
+          <Tooltip title={priceAndCount.discount ? t('modal.cart.discount', { discount: priceAndCount.discount }) : null} color="green" placement="top" trigger={['click', 'hover']}>
+            <Badge count={priceAndCount.discount && <Badge status="processing" color="green" />} offset={[5, 0]}>
+              <span className="text-end fw-bolder fs-6">
+                {t('modal.cart.summ', { price: priceAndCount.price })}
+              </span>
+            </Badge>
+          </Tooltip>
         </Modal.Footer>
       </Form>
     </Modal>

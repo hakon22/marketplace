@@ -1,10 +1,11 @@
 /* eslint-disable max-len */
 import { useEffect, useRef, useState } from 'react';
 import { Spinner } from 'react-bootstrap';
+import { Badge } from 'antd';
 import { useTranslation } from 'react-i18next';
 import Pagination from '../components/Pagination';
 import Helmet from '../components/Helmet';
-import CardItem from '../components/CardItem';
+import Card from '../components/Card';
 import { updateTokens } from '../slices/loginSlice';
 import { fetchItems, selectors } from '../slices/marketSlice';
 import { useAppDispatch, useAppSelector } from '../utilities/hooks';
@@ -64,7 +65,13 @@ const Marketplace = () => {
         <Helmet title={t('marketplace.title')} description={t('marketplace.description')} />
         <Cart />
         <div className="marketplace anim-show">
-          {showedData.map((item) => <CardItem key={item.id} item={item} />)}
+          {showedData.map((item) => (item.discount
+            ? (
+              <Badge.Ribbon key={item.id} text={<span className="fw-bold">{t('cardItem.discount', { discount: item.discount })}</span>} color="red">
+                <Card key={item.id} item={item} />
+              </Badge.Ribbon>
+            )
+            : <Card key={item.id} item={item} />))}
         </div>
         <Pagination
           data={sortedItems}

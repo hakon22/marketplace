@@ -1,4 +1,4 @@
-import { Card, Button } from 'react-bootstrap';
+import { Card as CardBootstrap, Button } from 'react-bootstrap';
 import { PlusCircle, DashCircle } from 'react-bootstrap-icons';
 import { useState, useEffect } from 'react';
 import { Rate } from 'antd';
@@ -10,9 +10,9 @@ import { useAppDispatch, useAppSelector } from '../utilities/hooks';
 import fetchImage from '../utilities/fetchImage';
 import type { CardItemProps } from '../types/Item';
 
-const CardItem = ({ item }: CardItemProps) => {
+const Card = ({ item }: CardItemProps) => {
   const {
-    id, name, image, unit, price,
+    id, name, image, unit, price, discount, discountPrice,
   } = item;
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
@@ -34,17 +34,28 @@ const CardItem = ({ item }: CardItemProps) => {
   }, []);
 
   return (
-    <Card className="card-item">
-      <Card.Img variant="top" className="mx-auto" src={srcImage} alt={name} />
-      <Card.Body className="pt-0">
+    <CardBootstrap className="card-item">
+      <div className="card-image mx-auto">
+        <CardBootstrap.Img variant="top" src={srcImage} alt={name} />
+      </div>
+      <CardBootstrap.Body className="pt-0">
         <Rate disabled defaultValue={4.5} />
         <div className="d-flex justify-content-between align-items-center mb-3">
-          <Card.Title>{name}</Card.Title>
-          <Card.Subtitle className="text-muted">{t('cardItem.subtitle', { price, unit })}</Card.Subtitle>
+          <CardBootstrap.Title>{name}</CardBootstrap.Title>
+          <CardBootstrap.Subtitle className="text-muted">
+            {t('cardItem.subtitle', { price: discountPrice || price, unit })}
+          </CardBootstrap.Subtitle>
         </div>
-        <Card.Text className="fs-bold fs-4">
-          {t('cardItem.price', { price })}
-        </Card.Text>
+        <CardBootstrap.Text as="div" className="fs-bold mb-3">
+          {discount
+            ? (
+              <div className="d-flex gap-4 price d-flex align-items-center">
+                <span className="fs-6 text-muted discount">{t('cardItem.price', { price })}</span>
+                <span className="fs-4 text-danger">{t('cardItem.price', { price: discountPrice })}</span>
+              </div>
+            )
+            : <span className="fs-4">{t('cardItem.price', { price })}</span>}
+        </CardBootstrap.Text>
         <div className="d-flex justify-content-center min-height-38">
           {countInCart
             ? (
@@ -71,7 +82,7 @@ const CardItem = ({ item }: CardItemProps) => {
                 variant="success"
                 onClick={() => {
                   dispatch(cartAdd({
-                    id, name, price, image: srcImage, unit, count: 1,
+                    id, name, price, discountPrice, image: srcImage, unit, count: 1,
                   }));
                 }}
               >
@@ -79,9 +90,9 @@ const CardItem = ({ item }: CardItemProps) => {
               </Button>
             ) }
         </div>
-      </Card.Body>
-    </Card>
+      </CardBootstrap.Body>
+    </CardBootstrap>
   );
 };
 
-export default CardItem;
+export default Card;

@@ -13,13 +13,18 @@ const Cart = () => {
   const { show, modalClose, modalShow } = useContext(ModalContext);
   const { scrollBar } = useContext(ScrollContext);
 
-  const items = Object.values(useAppSelector(selectors.selectEntities));
-  const initialObject: PriceAndCount = { price: 0, count: 0 };
+  const items = useAppSelector(selectors.selectAll);
+  const initialObject: PriceAndCount = { price: 0, discount: 0, count: 0 };
   const priceAndCount = items.reduce((acc, item) => {
     if (item) {
-      const { price, count } = item;
-      const generalPrice = price * count;
-      return { price: acc.price + generalPrice, count: acc.count + count };
+      const { price, count, discountPrice } = item;
+      const currentPrice = discountPrice || price;
+      const generalPrice = currentPrice * count;
+      return {
+        price: acc.price + generalPrice,
+        discount: acc.discount + ((price - currentPrice) * count),
+        count: acc.count + count,
+      };
     }
     return acc;
   }, initialObject);

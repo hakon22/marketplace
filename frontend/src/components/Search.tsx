@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AutoComplete } from 'antd';
+import { SearchOutlined } from '@ant-design/icons';
 import { toLower } from 'lodash';
 import { Button } from 'react-bootstrap';
 import fetchImage from '../utilities/fetchImage';
@@ -71,7 +72,7 @@ const Search = ({ items }: { items: Item[] }) => {
       title={name}
     >
       <div className="ant-select-item-option-content d-flex align-items-center gap-2">
-        <img className="col-md-2" alt={name} src={image} />
+        <img className="col-2" alt={name} src={image} />
         <span className="fs-6">{name}</span>
       </div>
     </Button>,
@@ -101,6 +102,7 @@ const Search = ({ items }: { items: Item[] }) => {
       placeholder={t('navBar.search')}
       notFoundContent={search && (<span className="ps-2 text-muted">{t('search.header')}</span>)}
       allowClear
+      suffixIcon={<SearchOutlined />}
       onClear={clearData}
       options={options(data)}
       onSearch={onSearch}
