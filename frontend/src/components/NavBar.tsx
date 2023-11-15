@@ -2,7 +2,7 @@
 import { useTranslation } from 'react-i18next';
 import { useContext, useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Dropdown, Select, AutoComplete } from 'antd';
+import { Dropdown, AutoComplete } from 'antd';
 import type { MenuProps } from 'antd';
 import cn from 'classnames';
 import { toLower } from 'lodash';
@@ -17,6 +17,8 @@ import { MobileContext } from './Context';
 import routes from '../routes';
 import type { Item } from '../types/Item';
 
+type Data = { name: string, image: string }[];
+
 const NavBar = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -24,7 +26,7 @@ const NavBar = () => {
   const dispatch = useAppDispatch();
 
   const [search, setSearch] = useState<string>();
-  const [data, setData] = useState<{ name: string, image: string }[]>([]);
+  const [data, setData] = useState<Data>([]);
 
   const [urlParams] = useSearchParams();
   const urlPage = Number(urlParams.get('page'));
@@ -99,6 +101,35 @@ const NavBar = () => {
     }
   };
 
+  const onSearch = async (q: string) => {
+    const images: string[] = [];
+    const result = itemsMarket.filter(({ name, composition, image }) => {
+      const query = toLower(q);
+      images.push(image);
+      return toLower(name).includes(query) || toLower(composition).includes(query);
+    });
+    const fetchedData = await Promise.all(result.map(async ({ name, image }) => {
+      const fetchedImage = await fetchImage(image);
+      return { name, image: fetchedImage };
+    }));
+    setData(fetchedData);
+  };
+
+  const options = (d: Data) => d.map(({ name, image }) => ({
+    label: <Button
+      onClick={() => {
+        searchHandler(name);
+      }}
+      className="ant-select-item ant-select-item-option ant-select-item-option-active"
+      title={name}
+    >
+      <div className="ant-select-item-option-content d-flex align-items-center gap-2">
+        <img className="col-md-2" alt={name} src={image} />
+        <span className="fs-6">{name}</span>
+      </div>
+    </Button>,
+  }));
+
   const handleChange = (value: string) => setSearch(value);
 
   useEffect(() => {
@@ -112,7 +143,7 @@ const NavBar = () => {
   return (
     <Navbar expand={isMobile ? 'xxl' : true}>
       <Container>
-        <Navbar.Text className="me-5 col-2">
+        <Navbar.Text className="me-md-5 col-md-2">
           <Link className="navbar-brand" to={routes.homePage}>{t('navBar.title')}</Link>
         </Navbar.Text>
         {isMobile && <ProfileButton className="ms-4" />}
@@ -121,8 +152,8 @@ const NavBar = () => {
           <span />
           <span />
         </Navbar.Toggle>
-        <Navbar.Collapse className="justify-content-start col-5">
-          <Nav className={isMobile ? '' : 'gap-3'}>
+        <Navbar.Collapse className="justify-content-start col-md-5">
+          <Nav className={isMobile ? 'mb-1' : 'gap-3'}>
             <Link className="nav-link" to="/discounts">{t('navBar.menu.discounts')}</Link>
             <Link className="nav-link" to="/delivery">{t('navBar.menu.delivery')}</Link>
             <Dropdown menu={{ items }} trigger={['click', 'hover']} className={cn('dropdown-toggle nav-link', { 'w-50': isMobile })}>
@@ -130,42 +161,18 @@ const NavBar = () => {
             </Dropdown>
           </Nav>
         </Navbar.Collapse>
-        <Navbar.Collapse className="justify-content-end col-4 me-3">
+        <Navbar.Collapse className="justify-content-end col-md-4 me-3">
           <AutoComplete
-            className="w-100"
+            value={search}
+            className="d-flex col-md-10"
             placeholder={t('navBar.search')}
             allowClear
-            options={(data || []).map(({ name, image }) => ({
-              label: <Button
-                onClick={() => {
-                  searchHandler(name);
-                }}
-                className="ant-select-item ant-select-item-option ant-select-item-option-active"
-                title={name}
-              >
-                <div className="ant-select-item-option-content d-flex align-items-center gap-2">
-                  <img className="col-2" alt={name} src={image} />
-                  <span className="fs-6">{name}</span>
-                </div>
-              </Button>,
-            }))}
-            onSearch={async (q) => {
-              const images: string[] = [];
-              const result = itemsMarket.filter(({ name, composition, image }) => {
-                const query = toLower(q);
-                images.push(image);
-                return toLower(name).includes(query) || toLower(composition).includes(query);
-              });
-              const fetchedData = await Promise.all(result.map(async ({ name, image }) => {
-                const fetchedImage = await fetchImage(image);
-                return { name, image: fetchedImage };
-              }));
-              setData(fetchedData);
-            }}
+            options={options(data)}
+            onSearch={onSearch}
             status="warning"
           />
         </Navbar.Collapse>
-        {!isMobile && <ProfileButton className="col-1" />}
+        {!isMobile && <ProfileButton className="col-md-2" />}
       </Container>
     </Navbar>
   );
