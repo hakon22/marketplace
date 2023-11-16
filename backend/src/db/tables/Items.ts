@@ -17,6 +17,7 @@ interface ItemsModel extends Model<InferAttributes<ItemsModel>, InferCreationAtt
     proteins: number,
     ccal: number,
   },
+  category: string;
 }
 
 const Items = db.define<ItemsModel>(
@@ -59,7 +60,11 @@ const Items = db.define<ItemsModel>(
     foodValues: {
       type: DataTypes.JSONB,
       allowNull: false,
-    }
+    },
+    category: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
   },
 );
 

@@ -24,6 +24,11 @@ const CreateItem = () => {
   const [isDiscount, setIsDiscount] = useState(false);
   const [fileList, setFileList] = useState<UploadFile[]>();
 
+  const units: string[] = ['kg', 'gr', 'ea'];
+
+  const categories: string[] = ['vegetables', 'fruits', 'frozen', 'freshMeat',
+    'dairy', 'fish', 'sweet', 'iceCream', 'chocolate'];
+
   const formik = useFormik({
     initialValues: {
       image: '',
@@ -40,6 +45,7 @@ const CreateItem = () => {
         ccal: '',
       },
       discount: '',
+      category: '',
     },
     validationSchema: createItemValidation,
     onSubmit: async (values, { resetForm, setFieldValue }) => {
@@ -150,6 +156,7 @@ const CreateItem = () => {
                 size="sm"
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
+                isValid={!!(!formik.errors.name && formik.submitCount)}
                 isInvalid={!!(formik.errors.name && formik.submitCount)}
                 autoComplete="on"
                 type="text"
@@ -183,6 +190,7 @@ const CreateItem = () => {
                           formik.setFieldValue('price', target.value.replace(/[^\d]/g, ''));
                         }}
                         onBlur={formik.handleBlur}
+                        isValid={!!(!formik.errors.price && formik.submitCount)}
                         isInvalid={!!(formik.errors.price && formik.submitCount)}
                         autoComplete="on"
                         type="text"
@@ -207,9 +215,7 @@ const CreateItem = () => {
                       value={formik.values.unit}
                       name="unit"
                     >
-                      <option value={t('createItem.unitItem.kg')}>{t('createItem.unitItem.kg')}</option>
-                      <option value={t('createItem.unitItem.gr')}>{t('createItem.unitItem.gr')}</option>
-                      <option value={t('createItem.unitItem.ea')}>{t('createItem.unitItem.ea')}</option>
+                      {units.map((unit) => <option key={unit} value={t(`createItem.unitItem.${unit}`)}>{t(`createItem.unitItem.${unit}`)}</option>)}
                     </Form.Select>
                   </InputGroup>
                 </Form.Group>
@@ -221,6 +227,7 @@ const CreateItem = () => {
                     size="sm"
                     onChange={numbersFilter}
                     onBlur={formik.handleBlur}
+                    isValid={!!(!formik.errors.count && formik.submitCount)}
                     isInvalid={!!(formik.errors.count && formik.submitCount)}
                     autoComplete="on"
                     type="text"
@@ -259,6 +266,24 @@ const CreateItem = () => {
                   </InputGroup>
                 </Form.Group>
               </div>
+              <Form.Group className={formClass('category', 'd-flex justify-content-between position-relative mb-3', formik)} controlId="category">
+                <Form.Label className="visually-hidden">{t('createItem.selectCategory')}</Form.Label>
+                <Form.Select
+                  size="sm"
+                  isInvalid={!!(formik.errors.category && formik.submitCount)}
+                  isValid={!!(!formik.errors.category && formik.submitCount)}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.category}
+                  name="category"
+                >
+                  <option value="">{t('createItem.selectCategory')}</option>
+                  {categories.map((category) => <option key={category} value={t(`navBar.menu.${category}`)}>{t(`navBar.menu.${category}`)}</option>)}
+                </Form.Select>
+                <Form.Control.Feedback type="invalid" tooltip>
+                  {t(formik.errors.category ?? '')}
+                </Form.Control.Feedback>
+              </Form.Group>
               <div className="mb-3">{t('createItem.foodValues')}</div>
               <div className={formik.errors.foodValues && formik.submitCount ? 'd-flex justify-content-between mb-6' : 'd-flex justify-content-between mb-3'}>
                 <Form.Group className="col-3 position-relative" controlId="carbohydrates">
@@ -267,6 +292,7 @@ const CreateItem = () => {
                     size="sm"
                     onChange={numbersFilter}
                     onBlur={formik.handleBlur}
+                    isValid={!!(!formik.errors.foodValues?.carbohydrates && formik.submitCount)}
                     isInvalid={!!(formik.errors.foodValues?.carbohydrates && formik.submitCount)}
                     autoComplete="on"
                     type="text"
@@ -285,6 +311,7 @@ const CreateItem = () => {
                     placeholder={t('createItem.fats')}
                     onChange={numbersFilter}
                     onBlur={formik.handleBlur}
+                    isValid={!!(!formik.errors.foodValues?.fats && formik.submitCount)}
                     isInvalid={!!(formik.errors.foodValues?.fats && formik.submitCount)}
                     autoComplete="on"
                     type="text"
@@ -302,6 +329,7 @@ const CreateItem = () => {
                     placeholder={t('createItem.proteins')}
                     onChange={numbersFilter}
                     onBlur={formik.handleBlur}
+                    isValid={!!(!formik.errors.foodValues?.proteins && formik.submitCount)}
                     isInvalid={!!(formik.errors.foodValues?.proteins && formik.submitCount)}
                     autoComplete="on"
                     type="text"
@@ -319,6 +347,7 @@ const CreateItem = () => {
                     placeholder={t('createItem.ccal')}
                     onChange={numbersFilter}
                     onBlur={formik.handleBlur}
+                    isValid={!!(!formik.errors.foodValues?.ccal && formik.submitCount)}
                     isInvalid={!!(formik.errors.foodValues?.ccal && formik.submitCount)}
                     autoComplete="on"
                     type="text"
@@ -338,6 +367,7 @@ const CreateItem = () => {
                   placeholder={t('createItem.composition')}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
+                  isValid={!!(!formik.errors.composition && formik.submitCount)}
                   isInvalid={!!(formik.errors.composition && formik.submitCount)}
                   autoComplete="on"
                   type="text"

@@ -82,7 +82,7 @@ const Card = ({ item }: CardItemProps) => {
                 variant="success"
                 onClick={() => {
                   dispatch(cartAdd({
-                    id, name, price, discountPrice, image: srcImage, unit, count: 1,
+                    id, name, price, discountPrice, discount, image: srcImage, unit, count: 1,
                   }));
                 }}
               >

@@ -513,13 +513,16 @@ export const ModalCart = ({
           {items.map((item) => {
             if (item) {
               const {
-                id, name, price, discountPrice, count, image, unit,
+                id, name, price, discountPrice, discount, count, image, unit,
               } = item;
               return (
                 <div key={id} className="row d-flex justify-content-between align-items-center">
                   <div className="d-flex align-items-center mb-3 mb-xl-0 col-12 col-xl-5">
                     <img src={image} alt={name} className="col-3 col-xl-2 me-4" />
-                    <span className="col-9 col-xl-6 fw-bold">{name}</span>
+                    <div className="col-9 col-xl-6 fw-bold d-flex align-items-center gap-1">
+                      <span>{name}</span>
+                      <Badge count={discount && t('cardItem.discount', { discount })} />
+                    </div>
                   </div>
                   <span className="col-5 col-xl-3 fs-5 text-xl-center d-flex align-items-center gap-2">
                     <DashCircle

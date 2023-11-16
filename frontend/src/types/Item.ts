@@ -1,7 +1,6 @@
 import type { Cart } from './Cart';
 
 export type Item = Cart & {
-  discount: number;
   composition: string;
   foodValues: {
     carbohydrates: number,

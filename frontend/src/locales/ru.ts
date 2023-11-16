@@ -121,6 +121,7 @@ export default {
       updatePrice: 'Обновить цену',
       adding: 'Добавление...',
       addItem: 'Добавить товар',
+      selectCategory: '-- Выберите категорию --',
     },
     imageCrop: {
       modalCancel: 'Закрыть',
