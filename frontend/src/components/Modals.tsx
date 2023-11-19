@@ -6,7 +6,7 @@ import InputMask from 'react-input-mask';
 import {
   PlusCircle, DashCircle, XCircle, Check2Circle,
 } from 'react-bootstrap-icons';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useFormik } from 'formik';
 import { Badge, Tooltip } from 'antd';
@@ -215,7 +215,15 @@ export const ModalRecovery = ({ onHide, show }: ModalProps) => {
       </Modal.Body>
       <Modal.Footer>
         <span>{t('recoveryForm.rememberPassword')}</span>
-        <Link to={routes.loginPage}>{t('loginForm.submit')}</Link>
+        <Alert.Link
+          className="text-primary"
+          onClick={() => {
+            onHide();
+            setTimeout(() => onHide('login'), 300);
+          }}
+        >
+          {t('loginForm.submit')}
+        </Alert.Link>
       </Modal.Footer>
     </Modal>
   );

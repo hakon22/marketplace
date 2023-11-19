@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { Breadcrumb as BreadcrumbAntd } from 'antd';
+import routes from '../routes';
 
 const Breadcrumb = () => {
   const { t } = useTranslation();
@@ -21,7 +22,7 @@ const Breadcrumb = () => {
       }
       if (index === 0) {
         return {
-          title: <Link to="/">{t('navBar.title')}</Link>,
+          title: <Link to={routes.homePage}>{t('navBar.title')}</Link>,
         };
       }
       linkArray.push(folder);

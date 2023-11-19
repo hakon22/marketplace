@@ -5,7 +5,7 @@ import type { PaginationProps } from '../types/Pagination';
 import type { Item } from '../types/Item';
 
 const Pagination = ({
-  data, setShowData, rowsPerPage, scrollRef, search,
+  data, setShowData, rowsPerPage, scrollRef, search, filter,
 }: PaginationProps<Item[]>) => {
   const navigate = useNavigate();
   const [urlParams] = useSearchParams();
@@ -52,7 +52,7 @@ const Pagination = ({
     } else {
       setTimeout(() => handleClick(1), 1);
     }
-  }, [pageParams, search]);
+  }, [pageParams, search, filter]);
 
   useEffect(() => {
     scrollRef.current?.scrollIntoView();

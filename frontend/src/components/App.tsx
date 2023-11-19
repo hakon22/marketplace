@@ -12,10 +12,10 @@ import NavBar from './NavBar';
 import Page404 from '../pages/Page404';
 import Activation from '../pages/Activation';
 import AuthContext, { MobileContext, ModalContext, ScrollContext } from './Context';
-import routes from '../routes';
+import routes, { catalogPages } from '../routes';
 import { useAppDispatch, useAppSelector } from '../utilities/hooks';
 import type { ModalShowType, ModalCloseType } from '../types/Modal';
-import { fetchTokenStorage, removeToken } from '../slices/loginSlice';
+import { fetchTokenStorage, removeToken, updateTokens } from '../slices/loginSlice';
 import { ModalLogin, ModalSignup, ModalRecovery } from './Modals';
 import Search from '../pages/Search';
 
@@ -102,6 +102,16 @@ const App = () => {
     };
   }, []);
 
+  useEffect(() => {
+    if (refreshToken) {
+      const fetch = () => dispatch(updateTokens(refreshToken));
+
+      const timeAlive = setTimeout(fetch, 595000);
+      return () => clearTimeout(timeAlive);
+    }
+    return undefined;
+  }, [refreshToken]);
+
   return (
     <AuthContext.Provider value={authServices}>
       <ModalContext.Provider value={modalServices}>
@@ -114,17 +124,23 @@ const App = () => {
               <ModalRecovery show={show} onHide={modalClose} />
               <hr className="mt-0" />
               <div className="container">
-                <div className="my-4 row d-flex justify-content-center">
+                <div className="my-4 row d-flex justify-content-end">
                   <Routes>
                     <Route path={routes.homePage} element={<Marketplace />} />
-                    <Route path="/discounts" element={<Marketplace />} />
-                    <Route path="/delivery" element={<Marketplace />} />
-                    <Route path="/sweet">
-                      <Route index element={<Marketplace />} />
-                      <Route path="/sweet/iceCream" element={<Marketplace />} />
-                      <Route path="/sweet/chocolate" element={<Marketplace />} />
+                    <Route path={catalogPages.discounts} element={<Marketplace filter="discounts" />} />
+                    <Route path={catalogPages.delivery} element={<Marketplace />} />
+                    <Route path={catalogPages.vegetables} element={<Marketplace filter="vegetables" />} />
+                    <Route path={catalogPages.fruits} element={<Marketplace filter="fruits" />} />
+                    <Route path={catalogPages.frozen} element={<Marketplace filter="frozen" />} />
+                    <Route path={catalogPages.freshMeat} element={<Marketplace filter="freshMeat" />} />
+                    <Route path={catalogPages.dairy} element={<Marketplace filter="dairy" />} />
+                    <Route path={catalogPages.fish} element={<Marketplace filter="fish" />} />
+                    <Route path={catalogPages.sweet}>
+                      <Route index element={<Marketplace filter="sweet" />} />
+                      <Route path={catalogPages.iceCream} element={<Marketplace filter="iceCream" />} />
+                      <Route path={catalogPages.chocolate} element={<Marketplace filter="chocolate" />} />
                     </Route>
-                    <Route path="/search" element={<Search />} />
+                    <Route path={routes.search} element={<Search />} />
                     <Route path={routes.activationPage} element={<Activation />} />
                     <Route path={routes.createItemPage} element={<CreateItem />} />
                     <Route path={routes.notFoundPage} element={<Page404 />} />

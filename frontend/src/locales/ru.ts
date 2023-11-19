@@ -121,7 +121,20 @@ export default {
       updatePrice: 'Обновить цену',
       adding: 'Добавление...',
       addItem: 'Добавить товар',
-      selectCategory: '-- Выберите категорию --',
+      selectCategory: 'Выберите категорию',
+      category: {
+        vegetables: 'Овощи',
+        fruits: 'Фрукты',
+        frozen: 'Заморозка',
+        freshMeat: 'Свежее мясо',
+        dairy: 'Молочные продукты',
+        fish: 'Рыба',
+        sweet: {
+          title: 'Сладкое',
+          iceCream: 'Мороженое',
+          chocolate: 'Шоколад',
+        },
+      },
     },
     imageCrop: {
       modalCancel: 'Закрыть',

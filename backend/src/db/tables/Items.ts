@@ -17,7 +17,7 @@ interface ItemsModel extends Model<InferAttributes<ItemsModel>, InferCreationAtt
     proteins: number,
     ccal: number,
   },
-  category: string;
+  category: string[];
 }
 
 const Items = db.define<ItemsModel>(
@@ -62,7 +62,7 @@ const Items = db.define<ItemsModel>(
       allowNull: false,
     },
     category: {
-      type: DataTypes.STRING,
+      type: DataTypes.ARRAY(DataTypes.STRING),
       allowNull: false,
     },
   },

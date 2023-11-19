@@ -151,6 +151,10 @@ body {
   background-color: #fcf5ed;
 }
 
+.ant-cascader-menu {
+  scrollbar-width: thin;
+}
+
 @keyframes show {
   0% { opacity: 0; }
   100% { opacity: 1; }

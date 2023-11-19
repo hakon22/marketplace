@@ -37,11 +37,14 @@ class Market {
         const imageName = `${Date.now()}-${image.name.replace(/[^\w\s.]/g, '').replaceAll(' ', '')}`;
         await sharp(image.data).png({ compressionLevel: 9, quality: 70 }).toFile(path.resolve(uploadFilesPath, imageName));
 
-        const {
-          carbohydrates, fats, proteins, ccal, ...rest
-        } = req.body;
+        const { foodValues, category, ...rest } = req.body;
 
-        const item = await Items_Table.create({ ...rest, image: imageName, foodValues: { carbohydrates, fats, proteins, ccal } });
+        const item = await Items_Table.create({
+          image: imageName,
+          category: JSON.parse(category),
+          foodValues: JSON.parse(foodValues),
+          ...rest,
+        });
         res.send({ code: 1, item });
       }
     } catch (e) {

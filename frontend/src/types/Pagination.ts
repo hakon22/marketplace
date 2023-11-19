@@ -4,4 +4,5 @@ export type PaginationProps<T> = {
   rowsPerPage: number;
   scrollRef: React.RefObject<HTMLElement>;
   search?: null | T;
+  filter?: undefined | string;
 }

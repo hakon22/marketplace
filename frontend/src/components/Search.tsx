@@ -89,7 +89,7 @@ const Search = ({ items }: { items: Item[] }) => {
     if (urlSearch && items.length) {
       searchHandler(urlSearch);
       onSearch(urlSearch);
-    } else {
+    } else if (search) {
       clearData();
       dispatch(searchUpdate(null));
     }

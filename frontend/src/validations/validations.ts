@@ -110,6 +110,6 @@ export const createItemValidation = yup.object().shape({
       .required(),
   }),
   category: yup
-    .string()
-    .required(),
+    .array()
+    .min(1, 'createItem.selectCategory'),
 });

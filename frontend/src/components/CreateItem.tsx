@@ -4,21 +4,36 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useFormik } from 'formik';
 import ImgCrop from 'antd-img-crop';
-import { useState, useEffect, useRef } from 'react';
+import {
+  useState, useEffect, useRef, useContext,
+} from 'react';
 import { PlusOutlined } from '@ant-design/icons';
-import { Upload, Tooltip, UploadFile } from 'antd';
+import {
+  Upload, Tooltip, UploadFile, Cascader,
+} from 'antd';
 import axios from 'axios';
+import { SingleValueType } from 'rc-cascader/lib/Cascader';
 import notify from '../utilities/toast';
 import { marketAdd } from '../slices/marketSlice';
 import { useAppDispatch } from '../utilities/hooks';
 import { createItemValidation } from '../validations/validations';
 import roundingEldorado from '../utilities/roundingEldorado';
 import formClass from '../utilities/formClass';
+import { MobileContext } from './Context';
 import routes from '../routes';
+
+interface Option {
+  value: string;
+  label: string;
+  children?: Option[];
+}
+
+const displayRender = (labels: string[]) => labels[labels.length - 1];
 
 const CreateItem = () => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
+  const isMobile = useContext(MobileContext);
 
   const uploadRef = useRef<HTMLDivElement>(null);
   const [isDiscount, setIsDiscount] = useState(false);
@@ -26,8 +41,23 @@ const CreateItem = () => {
 
   const units: string[] = ['kg', 'gr', 'ea'];
 
-  const categories: string[] = ['vegetables', 'fruits', 'frozen', 'freshMeat',
-    'dairy', 'fish', 'sweet', 'iceCream', 'chocolate'];
+  const fetchOptions = (object: object, subKey: string = ''): Option[] => Object.entries(object)
+    .map(([key, value]) => {
+      if (typeof value === 'object') {
+        delete value.title;
+        return {
+          value: key,
+          label: t(`createItem.category${subKey}.${key}.title`),
+          children: fetchOptions(value, `${subKey}.${key}`),
+        };
+      }
+      return {
+        value: key,
+        label: t(`createItem.category${!subKey ? '.' : `${subKey}.`}${key}`),
+      };
+    });
+
+  const categories: Option[] = fetchOptions(t('createItem.category', { returnObjects: true }));
 
   const formik = useFormik({
     initialValues: {
@@ -45,7 +75,7 @@ const CreateItem = () => {
         ccal: '',
       },
       discount: '',
-      category: '',
+      category: [],
     },
     validationSchema: createItemValidation,
     onSubmit: async (values, { resetForm, setFieldValue }) => {
@@ -54,17 +84,11 @@ const CreateItem = () => {
           values.discount = '0';
           values.discountPrice = '0';
         }
-        const {
-          foodValues: {
-            carbohydrates, fats, proteins, ccal,
-          }, ...rest
-        } = values;
+        const { foodValues, category, ...rest } = values;
         const { data } = await axios.post(routes.createItem, {
+          foodValues: JSON.stringify(foodValues),
+          category: JSON.stringify(category),
           ...rest,
-          carbohydrates,
-          fats,
-          proteins,
-          ccal,
         }, {
           headers: {
             'Content-Type': 'multipart/form-data',
@@ -73,6 +97,7 @@ const CreateItem = () => {
         if (data.code === 1) {
           dispatch(marketAdd(data.item));
           setFieldValue('image', '');
+          setFieldValue('category', []);
           setFileList([]);
           resetForm();
         }
@@ -82,6 +107,8 @@ const CreateItem = () => {
       }
     },
   });
+
+  const onChange = (value: SingleValueType) => formik.setFieldValue('category', value || []);
 
   const updatePrice = () => {
     const { price, discount } = formik.values;
@@ -268,19 +295,17 @@ const CreateItem = () => {
               </div>
               <Form.Group className={formClass('category', 'd-flex justify-content-between position-relative mb-3', formik)} controlId="category">
                 <Form.Label className="visually-hidden">{t('createItem.selectCategory')}</Form.Label>
-                <Form.Select
-                  size="sm"
-                  isInvalid={!!(formik.errors.category && formik.submitCount)}
-                  isValid={!!(!formik.errors.category && formik.submitCount)}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
+                <Cascader
                   value={formik.values.category}
-                  name="category"
-                >
-                  <option value="">{t('createItem.selectCategory')}</option>
-                  {categories.map((category) => <option key={category} value={t(`navBar.menu.${category}`)}>{t(`navBar.menu.${category}`)}</option>)}
-                </Form.Select>
-                <Form.Control.Feedback type="invalid" tooltip>
+                  options={categories}
+                  className="col-7"
+                  placeholder={t('createItem.selectCategory')}
+                  expandTrigger={isMobile ? 'click' : 'hover'}
+                  displayRender={displayRender}
+                  status={(formik.errors.category && formik.submitCount) ? 'error' : ''}
+                  onChange={onChange}
+                />
+                <Form.Control.Feedback type="invalid" className={formik.errors.category && formik.submitCount ? 'd-block' : ''} tooltip>
                   {t(formik.errors.category ?? '')}
                 </Form.Control.Feedback>
               </Form.Group>

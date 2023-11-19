@@ -16,7 +16,6 @@ const Card = ({ item }: CardItemProps) => {
   } = item;
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
-  const { hostname } = window.location;
 
   const [srcImage, setSrcImage] = useState('');
   const countInCart = useAppSelector((state) => selectors.selectById(state, id))?.count;
@@ -26,11 +25,7 @@ const Card = ({ item }: CardItemProps) => {
     : dispatch(cartUpdate({ id: itemId, changes: { count } })));
 
   useEffect(() => {
-    if (hostname === 'localhost') {
-      fetchImage(image, setSrcImage);
-    } else {
-      setSrcImage(`${process.env.PUBLIC_URL}/static/media/${image}`);
-    }
+    fetchImage(image, setSrcImage);
   }, []);
 
   return (

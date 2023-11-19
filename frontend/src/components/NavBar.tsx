@@ -9,7 +9,7 @@ import ProfileButton from './ProfileButton';
 import { useAppSelector } from '../utilities/hooks';
 import { selectors } from '../slices/marketSlice';
 import { MobileContext } from './Context';
-import routes from '../routes';
+import routes, { catalogPages } from '../routes';
 import type { Item } from '../types/Item';
 import Search from './Search';
 
@@ -22,39 +22,39 @@ const NavBar = () => {
   const items: MenuProps['items'] = [
     {
       key: '1',
-      label: (<Link className="nav-link" to={routes.signupPage}>{t('navBar.menu.vegetables')}</Link>),
+      label: (<Link className="nav-link" to={catalogPages.vegetables}>{t('navBar.menu.vegetables')}</Link>),
     },
     {
       key: '2',
-      label: (<Link className="nav-link" to={routes.signupPage}>{t('navBar.menu.fruits')}</Link>),
+      label: (<Link className="nav-link" to={catalogPages.fruits}>{t('navBar.menu.fruits')}</Link>),
     },
     {
       key: '3',
-      label: (<Link className="nav-link" to={routes.signupPage}>{t('navBar.menu.frozen')}</Link>),
+      label: (<Link className="nav-link" to={catalogPages.frozen}>{t('navBar.menu.frozen')}</Link>),
     },
     {
       key: '4',
-      label: (<Link className="nav-link" to={routes.signupPage}>{t('navBar.menu.freshMeat')}</Link>),
+      label: (<Link className="nav-link" to={catalogPages.freshMeat}>{t('navBar.menu.freshMeat')}</Link>),
     },
     {
       key: '5',
-      label: (<Link className="nav-link" to={routes.signupPage}>{t('navBar.menu.dairy')}</Link>),
+      label: (<Link className="nav-link" to={catalogPages.dairy}>{t('navBar.menu.dairy')}</Link>),
     },
     {
       key: '6',
-      label: (<Link className="nav-link" to={routes.signupPage}>{t('navBar.menu.fish')}</Link>),
+      label: (<Link className="nav-link" to={catalogPages.fish}>{t('navBar.menu.fish')}</Link>),
     },
     {
       key: '7',
-      label: isMobile ? t('navBar.menu.sweet') : (<Link className="nav-link" to="/sweet">{t('navBar.menu.sweet')}</Link>),
+      label: isMobile ? t('navBar.menu.sweet') : (<Link className="nav-link" to={catalogPages.sweet}>{t('navBar.menu.sweet')}</Link>),
       children: [
         {
           key: '7-1',
-          label: (<Link className="nav-link" to="/sweet/iceCream">{t('navBar.menu.iceCream')}</Link>),
+          label: (<Link className="nav-link" to={catalogPages.iceCream}>{t('navBar.menu.iceCream')}</Link>),
         },
         {
           key: '7-2',
-          label: (<Link className="nav-link" to="/sweet/chocolate">{t('navBar.menu.chocolate')}</Link>),
+          label: (<Link className="nav-link" to={catalogPages.chocolate}>{t('navBar.menu.chocolate')}</Link>),
         },
       ],
     },
@@ -66,7 +66,7 @@ const NavBar = () => {
         <Navbar.Text className="me-md-5 col-md-2">
           <Link className="navbar-brand" to={routes.homePage}>{t('navBar.title')}</Link>
         </Navbar.Text>
-        {isMobile && <ProfileButton className="ms-4" />}
+        {isMobile && <ProfileButton className="ms-5" />}
         <Navbar.Toggle>
           <span />
           <span />
@@ -74,8 +74,8 @@ const NavBar = () => {
         </Navbar.Toggle>
         <Navbar.Collapse className="justify-content-start col-md-5">
           <Nav className={isMobile ? 'mb-1' : 'gap-3'}>
-            <Link className="nav-link" to="/discounts">{t('navBar.menu.discounts')}</Link>
-            <Link className="nav-link" to="/delivery">{t('navBar.menu.delivery')}</Link>
+            <Link className="nav-link" to={catalogPages.discounts}>{t('navBar.menu.discounts')}</Link>
+            <Link className="nav-link" to={catalogPages.delivery}>{t('navBar.menu.delivery')}</Link>
             <Dropdown menu={{ items }} trigger={['click', 'hover']} className={cn('dropdown-toggle nav-link', { 'w-50': isMobile })}>
               <span role="button">{t('navBar.menu.catalog')}</span>
             </Dropdown>

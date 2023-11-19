@@ -4,14 +4,26 @@ interface ApiUrl {
   [key: string]: string;
 }
 
+export const catalogPages: ApiUrl = {
+  discounts: '/discounts',
+  delivery: '/delivery',
+  vegetables: '/vegetables',
+  fruits: '/fruits',
+  frozen: '/frozen',
+  freshMeat: '/freshMeat',
+  dairy: '/dairy',
+  fish: '/fish',
+  sweet: '/sweet',
+  iceCream: ['/sweet', 'iceCream'].join('/'),
+  chocolate: ['/sweet', 'chocolate'].join('/'),
+};
+
 export default {
   homePage: '/',
-  loginPage: '/login',
-  signupPage: '/signup',
-  recoveryPasswordPage: '/recovery',
   activationPage: '/activation/:id',
   activationUrlPage: '/activation/',
   createItemPage: '/create',
+  searchPage: '/search',
   notFoundPage: '*',
   login: [apiPath, 'auth', 'login'].join('/'),
   signup: [apiPath, 'auth', 'signup'].join('/'),
