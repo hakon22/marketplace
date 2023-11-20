@@ -8,6 +8,7 @@ interface UserModel extends Model<InferAttributes<UserModel>, InferCreationAttri
   password: string;
   email: string;
   phone: string;
+  role: string;
   refresh_token: string[];
   code_activation: number;
   createdAt?: string;
@@ -42,6 +43,10 @@ const Users = db.define<UserModel>(
       type: DataTypes.STRING,
       allowNull: false,
       unique: true,
+    },
+    role: {
+      type: DataTypes.STRING,
+      allowNull: false,
     },
     refresh_token: {
       type: DataTypes.ARRAY(DataTypes.TEXT),

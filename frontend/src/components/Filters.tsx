@@ -1,11 +1,16 @@
 import { useState } from 'react';
-import { Menu, Select } from 'antd';
+import { Menu, Select, Slider } from 'antd';
 import { AppstoreOutlined, MailOutlined, SettingOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 
-type FiltersProps = {
-  filterOptions: string,
-  setFilterOptions: React.Dispatch<React.SetStateAction<string>>,
+type FilterOptions = {
+  sortBy: string;
+  rangePrice: number[];
+}
+
+type FilterProps = {
+  filterOptions: FilterOptions,
+  setFilterOptions: React.Dispatch<React.SetStateAction<FilterOptions>>,
 };
 
 type MenuItem = Required<MenuProps>['items'][number];
@@ -28,24 +33,32 @@ function getItem(
 
 const rootSubmenuKeys = ['sub1', 'sub2', 'sub4'];
 
-const Filters = ({ filterOptions, setFilterOptions }: FiltersProps) => {
+const Filters = ({ filterOptions, setFilterOptions }: FilterProps) => {
+  const { sortBy, rangePrice } = filterOptions;
+  console.log(filterOptions);
   const items: MenuItem[] = [
-    getItem('Navigation One', 'sub1', <MailOutlined />, [
+    getItem('Цена', 'sub1', <MailOutlined />, [
       getItem(<Select
-        defaultValue={filterOptions}
+        defaultValue={sortBy}
         className="w-100"
-        onChange={(value) => setFilterOptions(value)}
+        onChange={(value) => setFilterOptions({ sortBy: value, rangePrice })}
         options={[
-          { value: 'name', label: 'по наименованию' },
-          { value: 'overPrice', label: 'по убыванию цены' },
-          { value: 'lowerPrice', label: 'по возрастанию цены' },
+          { value: 'name', label: 'По алфавиту' },
+          { value: 'overPrice', label: 'Сначала дороже' },
+          { value: 'lowerPrice', label: 'Сначала дешевле' },
         ]}
       />, '1'),
-      getItem('Option 2', '2'),
+      getItem(<Slider
+        className="w-100"
+        range={{ draggableTrack: true }}
+        min={rangePrice[0]}
+        max={rangePrice[1]}
+        defaultValue={rangePrice}
+      />, '2'),
       getItem('Option 3', '3'),
       getItem('Option 4', '4'),
     ]),
-    getItem('Navigation Two', 'sub2', <AppstoreOutlined />, [
+    getItem('Каллории', 'sub2', <AppstoreOutlined />, [
       getItem('Option 5', '5'),
       getItem('Option 6', '6'),
       getItem('Submenu', 'sub3', null, [getItem('Option 7', '7'), getItem('Option 8', '8')]),

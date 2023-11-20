@@ -22,6 +22,7 @@ import textFieldGen from '../utilities/textFieldGen';
 import AuthContext, { MobileContext, ScrollContext } from './Context';
 import { emailValidation, loginValidation, signupValidation } from '../validations/validations';
 import { ModalActivateProps, ModalCartProps, ModalProps } from '../types/Modal';
+import CreateItem from './CreateItem';
 
 const ModalChangeActivationEmail = ({
   id, email, onHide, show,
@@ -482,6 +483,29 @@ export const ModalSignup = ({ onHide, show }: ModalProps) => {
           {t('loginForm.submit')}
         </Alert.Link>
       </Modal.Footer>
+    </Modal>
+  );
+};
+
+export const ModalCreateItem = ({ onHide, show }: ModalProps) => {
+  const { t } = useTranslation();
+  const { setMarginScroll } = useContext(ScrollContext);
+
+  return (
+    <Modal
+      show={show === 'createItem'}
+      contentClassName="modal-bg"
+      onHide={onHide}
+      onEnter={setMarginScroll}
+      onExited={setMarginScroll}
+      centered
+    >
+      <Modal.Header closeButton>
+        <Modal.Title className="text-center w-100">{t('createItem.title')}</Modal.Title>
+      </Modal.Header>
+      <Modal.Body className="d-flex justify-content-center">
+        <CreateItem />
+      </Modal.Body>
     </Modal>
   );
 };

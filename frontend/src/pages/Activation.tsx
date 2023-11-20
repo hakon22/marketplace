@@ -35,14 +35,16 @@ const Activation = () => {
       </div>
     )
     : continueActivation ? (
-      <div className="col-12 col-md-8">
-        <Helmet title={t('activationForm.title')} description={t('activationForm.submit')} />
-        <Card border="secondary" className="text-center card-bg">
-          <Card.Header className="h4">{t('activationForm.title')}</Card.Header>
-          <Card.Body>
-            <ActivationForm id={id} />
-          </Card.Body>
-        </Card>
+      <div className="my-4 row d-flex justify-content-center">
+        <div className="col-12 col-md-8">
+          <Helmet title={t('activationForm.title')} description={t('activationForm.submit')} />
+          <Card border="secondary" className="text-center card-bg">
+            <Card.Header className="h4">{t('activationForm.title')}</Card.Header>
+            <Card.Body>
+              <ActivationForm id={id} />
+            </Card.Body>
+          </Card>
+        </div>
       </div>
     ) : <Page404 />;
 };

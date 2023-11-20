@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import {
-  BoxArrowInRight, BoxArrowInLeft, CartCheck, PersonAdd, PersonCircle,
+  BoxArrowInRight, BoxArrowInLeft, CartCheck, PersonAdd, PersonCircle, FilePlus,
 } from 'react-bootstrap-icons';
 import { useContext } from 'react';
 import { Avatar } from 'antd';
@@ -14,7 +14,7 @@ const ProfileButton = ({ className }: { className?: string }) => {
   const { logOut, loggedIn } = useContext(AuthContext);
   const { modalShow } = useContext(ModalContext);
 
-  const { username } = useAppSelector((state) => state.login);
+  const { username, role } = useAppSelector((state) => state.login);
 
   return (
     <NavDropdown
@@ -26,11 +26,17 @@ const ProfileButton = ({ className }: { className?: string }) => {
         <>
           <NavDropdown.ItemText className="text-muted">{username}</NavDropdown.ItemText>
           <NavDropdown.Divider />
-          <NavDropdown.Item href="#action5">
+          {role === 'admin' && (
+            <NavDropdown.Item onClick={() => modalShow('createItem')}>
+              <FilePlus />
+              {t('createItem.addItem')}
+            </NavDropdown.Item>
+          )}
+          <NavDropdown.Item href="#">
             <PersonCircle />
             {t('profileButton.profile')}
           </NavDropdown.Item>
-          <NavDropdown.Item href="#action4">
+          <NavDropdown.Item href="#">
             <CartCheck />
             {t('profileButton.myOrders')}
           </NavDropdown.Item>

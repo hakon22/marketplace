@@ -1,5 +1,7 @@
 /* eslint-disable max-len */
-import { useEffect, useRef, useState } from 'react';
+import {
+  useEffect, useRef, useState, useMemo,
+} from 'react';
 import { Spinner } from 'react-bootstrap';
 import { Badge, FloatButton } from 'antd';
 import { useTranslation } from 'react-i18next';
@@ -10,7 +12,7 @@ import { fetchItems, selectors } from '../slices/marketSlice';
 import { useAppDispatch, useAppSelector } from '../utilities/hooks';
 import Cart from '../components/Cart';
 import Breadcrumb from '../components/Breadcrumb';
-import Filters from './Filters';
+import Filters from '../components/Filters';
 import type { Item } from '../types/Item';
 
 const Marketplace = ({ filter }: { filter?: string }) => {
@@ -27,6 +29,10 @@ const Marketplace = ({ filter }: { filter?: string }) => {
     return true;
   });
 
+  const prices = items.map((item) => item.price);
+  const min = useMemo(() => Math.min(...prices), [prices]);
+  const max = useMemo(() => Math.max(...prices), [prices]);
+
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const sortByName = (a: Item, b: Item) => {
@@ -38,18 +44,26 @@ const Marketplace = ({ filter }: { filter?: string }) => {
     }
     return 0;
   };
-
   const sortByOverPrice = (a: Item, b: Item) => b.price - a.price;
-
   const sortByLowerPrice = (a: Item, b: Item) => a.price - b.price;
+  const sortByRangePrice = (a: Item) => {
+    if (a.price >= min && a.price <= max) {
+      return 1;
+    }
+    if (a.price <= min && a.price >= max) {
+      return -1;
+    }
+    return 0;
+  };
 
-  const [filterOptions, setFilterOptions] = useState('name');
+  const [filterOptions, setFilterOptions] = useState({ sortBy: 'name', rangePrice: [min, max] });
+  const { sortBy, rangePrice } = filterOptions;
 
   const sortedItems: Item[] = (search && [...search].sort((a, b) => sortByName(a, b))) || items.sort((a, b) => {
-    if (filterOptions === 'overPrice') {
+    if (sortBy === 'overPrice') {
       return sortByOverPrice(a, b);
     }
-    if (filterOptions === 'lowerPrice') {
+    if (sortBy === 'lowerPrice') {
       return sortByLowerPrice(a, b);
     }
     return sortByName(a, b);
@@ -76,7 +90,12 @@ const Marketplace = ({ filter }: { filter?: string }) => {
 
   useEffect(() => {
     setShowData(items.slice(0, showedItemsCount));
-  }, [filterOptions]);
+    if (min) {
+      setFilterOptions({ sortBy, rangePrice: [min, max] });
+    }
+  }, [sortBy, min, items.length]);
+
+  console.log(rangePrice);
 
   return loadingStatus !== 'finish' ? (
     <div className="position-absolute top-50 start-50">
@@ -85,28 +104,30 @@ const Marketplace = ({ filter }: { filter?: string }) => {
   ) : (
     <>
       <Breadcrumb />
-      <div className="col-12 col-md-10 my-4" ref={scrollRef}>
-        <Helmet title={t('marketplace.title')} description={t('marketplace.description')} />
-        <Cart />
-        <Filters filterOptions={filterOptions} setFilterOptions={setFilterOptions} />
-        <div className="marketplace anim-show">
-          {showedData.map((item) => (item.discount
-            ? (
-              <Badge.Ribbon key={item.id} text={<span className="fw-bold">{t('cardItem.discount', { discount: item.discount })}</span>} color="red">
-                <Card key={item.id} item={item} />
-              </Badge.Ribbon>
-            )
-            : <Card key={item.id} item={item} />))}
+      <div className="my-4 row d-flex justify-content-end">
+        <div className="col-12 col-md-10 my-4" ref={scrollRef}>
+          <Helmet title={t('marketplace.title')} description={t('marketplace.description')} />
+          <Cart />
+          <Filters filterOptions={filterOptions} setFilterOptions={setFilterOptions} />
+          <div className="marketplace anim-show">
+            {showedData.map((item) => (item.discount
+              ? (
+                <Badge.Ribbon key={item.id} text={<span className="fw-bold">{t('cardItem.discount', { discount: item.discount })}</span>} color="red">
+                  <Card key={item.id} item={item} />
+                </Badge.Ribbon>
+              )
+              : <Card key={item.id} item={item} />))}
+          </div>
+          <Pagination
+            data={sortedItems}
+            setShowData={setShowData}
+            rowsPerPage={showedItemsCount}
+            scrollRef={scrollRef}
+            search={search}
+            filter={filter}
+          />
+          <FloatButton.BackTop />
         </div>
-        <Pagination
-          data={sortedItems}
-          setShowData={setShowData}
-          rowsPerPage={showedItemsCount}
-          scrollRef={scrollRef}
-          search={search}
-          filter={filter}
-        />
-        <FloatButton.BackTop />
       </div>
     </>
   );

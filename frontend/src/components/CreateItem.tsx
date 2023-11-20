@@ -100,6 +100,7 @@ const CreateItem = () => {
           setFieldValue('category', []);
           setFileList([]);
           resetForm();
+          notify(t('toast.createItemSuccess'), 'success');
         }
       } catch (e) {
         notify(t('toast.unknownError'), 'error');
@@ -135,7 +136,7 @@ const CreateItem = () => {
 
   return (
     <div className="marketplace d-flex justify-content-center">
-      <Form onSubmit={formik.handleSubmit} className="col-12 col-xl-4">
+      <Form onSubmit={formik.handleSubmit} className="col-12">
         <Card className="card-item">
           <div ref={uploadRef} className={formik.errors.image && formik.submitCount ? 'position-relative d-flex justify-content-center mb-3' : 'position-relative d-flex justify-content-center'}>
             <ImgCrop
@@ -297,6 +298,7 @@ const CreateItem = () => {
                 <Form.Label className="visually-hidden">{t('createItem.selectCategory')}</Form.Label>
                 <Cascader
                   value={formik.values.category}
+                  id="category"
                   options={categories}
                   className="col-7"
                   placeholder={t('createItem.selectCategory')}

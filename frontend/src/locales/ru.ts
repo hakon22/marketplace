@@ -92,11 +92,13 @@ export default {
       emailSuccess: 'Сообщение успешно отправлено',
       changeEmailSuccess: 'Почта успешно обновлена',
       doesNotRequireActivation: 'Аккаунт не требует активации',
+      createItemSuccess: 'Товар успешно добавлен',
       networkError: 'Ошибка соединения',
       unknownError: 'Неизвестная ошибка',
       authError: 'Ошибка аутентификации',
     },
     createItem: {
+      title: 'Добавить товар',
       upload: 'Загрузить',
       nameItem: 'Название товара',
       priceItem: 'Цена',

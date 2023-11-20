@@ -2,7 +2,7 @@ import type { PriceAndCount, Cart } from './Cart';
 
 export type ModalCloseType = 'order' | 'recovery' | 'login' | 'signup' | boolean;
 
-export type ModalShowType = ModalCloseType | 'cart' | 'activation';
+export type ModalShowType = ModalCloseType | 'cart' | 'activation' | 'createItem';
 
 export type ModalProps = {
   onHide: (arg?: ModalCloseType) => void;

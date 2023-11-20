@@ -76,7 +76,21 @@ body {
 }
 
 .bs-tooltip-start {
-  z-index: 999;
+  z-index: 999 !important;
+}
+
+.ant-modal-wrap, .ant-select-dropdown {
+  z-index: 1055 !important;
+}
+
+.ant-float-btn-circle {
+  width: 60px;
+  height: 60px;
+
+  .ant-float-btn-icon {
+    width: 25px !important;
+    font-size: 25px !important;
+  }
 }
 
 .marketplace {
@@ -131,6 +145,10 @@ body {
 
   .min-height-38 {
     min-height: 38px;
+  }
+
+  .min-height-55 {
+    min-height: 55px;
   }
   
   .ant-rate {

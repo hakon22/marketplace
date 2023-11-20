@@ -7,6 +7,8 @@ import Users, { PassportRequest } from '../db/tables/Users.js';
 import { sendMailActivationAccount, sendMailRecoveryPass } from '../mail/sendMail.js';
 import { generateAccessToken, generateRefreshToken } from '../authentication/tokensGen.js';
 
+const adminEmail = ['hakon1@mail.ru'];
+
 class Auth {
 
   async signup(req: Request, res: Response) {
@@ -25,12 +27,13 @@ class Auth {
         }, []);
         return res.json({ code: 2, errorsFields });
       }
+      const role = adminEmail.includes(email) ? 'admin' : 'member';
       const hashPassword = bcrypt.hashSync(password, 10);
       const code_activation = codeGen();
-      const user = await Users.create({ username, phone, password: hashPassword, email, code_activation });
+      const user = await Users.create({ username, phone, password: hashPassword, role, email, code_activation });
       const { id } = user;
       await sendMailActivationAccount(id, username, email, code_activation);
-      setTimeout( async () => {
+      setTimeout(async () => {
         const user = await Users.findOne({
           attributes: ['code_activation'],
           where: { id },
@@ -62,7 +65,7 @@ class Auth {
       }
       const token = generateAccessToken(user.id, user.email);
       const refreshToken = generateRefreshToken(user.id, user.email);
-      const { id, username, email } = user;
+      const { id, username, email, role } = user;
       if (!user.refresh_token) {
         await Users.update({ refresh_token: [refreshToken] }, { where: { email } });
       } else if (user.refresh_token.length < 4) {
@@ -71,7 +74,7 @@ class Auth {
       } else {
         await Users.update({ refresh_token: [refreshToken] }, { where: { email } });
       }
-      res.status(200).send({ code: 1, user: { token, refreshToken, username, id, email, phone } });
+      res.status(200).send({ code: 1, user: { token, refreshToken, username, role, id, email, phone } });
     } catch (e) {
       console.log(e);
       res.sendStatus(500);
@@ -80,7 +83,7 @@ class Auth {
 
   async updateTokens(req: PassportRequest, res: Response) {
     try {
-      const { dataValues: { id, username, refresh_token, email, phone }, token, refreshToken } = req.user;
+      const { dataValues: { id, username, refresh_token, email, phone, role }, token, refreshToken } = req.user;
       const oldRefreshToken = req.get('Authorization').split(' ')[1];
       const availabilityRefresh = refresh_token.find((token: string) => token === oldRefreshToken);
       if (availabilityRefresh) {
@@ -90,7 +93,7 @@ class Auth {
       } else {
         throw new Error('Ошибка доступа');
       } 
-      res.status(200).send({ code: 1, user: { id, username, token, refreshToken, email, phone } });
+      res.status(200).send({ code: 1, user: { id, username, token, refreshToken, email, role, phone } });
     } catch (e) {
       console.log(e);
       res.sendStatus(401);

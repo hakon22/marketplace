@@ -35,7 +35,7 @@ const Card = ({ item }: CardItemProps) => {
       </div>
       <CardBootstrap.Body className="pt-0">
         <Rate disabled defaultValue={4.5} />
-        <div className="d-flex justify-content-between align-items-center mb-3">
+        <div className="d-flex justify-content-between align-items-center gap-1 mb-3  min-height-55">
           <CardBootstrap.Title>{name}</CardBootstrap.Title>
           <CardBootstrap.Subtitle className="text-muted">
             {t('cardItem.subtitle', { price: discountPrice || price, unit })}
