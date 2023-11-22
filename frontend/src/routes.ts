@@ -22,7 +22,6 @@ export default {
   homePage: '/',
   activationPage: '/activation/:id',
   activationUrlPage: '/activation/',
-  createItemPage: '/create',
   searchPage: '/search',
   notFoundPage: '*',
   login: [apiPath, 'auth', 'login'].join('/'),

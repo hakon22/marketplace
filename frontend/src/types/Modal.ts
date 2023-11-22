@@ -6,7 +6,7 @@ export type ModalShowType = ModalCloseType | 'cart' | 'activation' | 'createItem
 
 export type ModalProps = {
   onHide: (arg?: ModalCloseType) => void;
-  show: ModalShowType;
+  show?: ModalShowType;
 }
 
 export type ModalActivateProps = ModalProps & {

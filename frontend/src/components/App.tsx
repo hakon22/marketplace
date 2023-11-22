@@ -7,7 +7,6 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import axios from 'axios';
 import notify from '../utilities/toast';
 import Marketplace from '../pages/Marketplace';
-import CreateItem from './CreateItem';
 import NavBar from './NavBar';
 import Page404 from '../pages/Page404';
 import Activation from '../pages/Activation';
@@ -146,7 +145,6 @@ const App = () => {
                   </Route>
                   <Route path={routes.searchPage} element={<Search />} />
                   <Route path={routes.activationPage} element={<Activation />} />
-                  <Route path={routes.createItemPage} element={<CreateItem />} />
                   <Route path={routes.notFoundPage} element={<Page404 />} />
                 </Routes>
               </div>

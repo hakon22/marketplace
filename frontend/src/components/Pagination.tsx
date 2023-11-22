@@ -1,11 +1,17 @@
 import { Pagination as BootstrapPagination } from 'react-bootstrap';
 import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import type { PaginationProps } from '../types/Pagination';
 import type { Item } from '../types/Item';
 
+type PaginationProps<T> = {
+  data: T;
+  setShowData: React.Dispatch<React.SetStateAction<T>>;
+  rowsPerPage: number;
+  scrollRef: React.RefObject<HTMLElement>;
+}
+
 const Pagination = ({
-  data, setShowData, rowsPerPage, scrollRef, search, filter,
+  data, setShowData, rowsPerPage, scrollRef,
 }: PaginationProps<Item[]>) => {
   const navigate = useNavigate();
   const [urlParams] = useSearchParams();
@@ -47,12 +53,8 @@ const Pagination = ({
   }
 
   useEffect(() => {
-    if (pageParams > 1) {
-      setTimeout(() => handleClick(pageParams), 1);
-    } else {
-      setTimeout(() => handleClick(1), 1);
-    }
-  }, [pageParams, search, filter]);
+    setTimeout(() => handleClick(pageParams), 1);
+  }, [data]);
 
   useEffect(() => {
     scrollRef.current?.scrollIntoView();

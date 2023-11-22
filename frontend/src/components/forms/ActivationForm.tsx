@@ -9,15 +9,15 @@ import {
   Button, Form, FloatingLabel, Image, DropdownButton, ButtonGroup, Dropdown, Spinner,
 } from 'react-bootstrap';
 import { EnvelopeAt } from 'react-bootstrap-icons';
-import notify from '../utilities/toast';
-import { updateTokens } from '../slices/loginSlice';
-import { MobileContext, ModalContext } from './Context';
-import ModalChangeActivationEmail from './Modals';
-import { useAppDispatch, useAppSelector } from '../utilities/hooks';
-import { activationValidation } from '../validations/validations';
-import formClass from '../utilities/formClass';
-import pineapple from '../images/pineapple.svg';
-import routes from '../routes';
+import notify from '../../utilities/toast';
+import { updateTokens } from '../../slices/loginSlice';
+import { MobileContext, ModalContext } from '../Context';
+import ModalChangeActivationEmail from '../Modals';
+import { useAppDispatch, useAppSelector } from '../../utilities/hooks';
+import { activationValidation } from '../../validations/validations';
+import formClass from '../../utilities/formClass';
+import pineapple from '../../images/pineapple.svg';
+import routes from '../../routes';
 
 const ActivationForm = ({ id }: { id: string | undefined }) => {
   const { t } = useTranslation();

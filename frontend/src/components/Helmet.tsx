@@ -1,5 +1,9 @@
 import { Helmet as ReactHelmet } from 'react-helmet';
-import type { HelmetProps } from '../types/Helmet';
+
+type HelmetProps = {
+  title: string;
+  description: string;
+}
 
 const Helmet = ({ title, description }: HelmetProps) => (
   <ReactHelmet>

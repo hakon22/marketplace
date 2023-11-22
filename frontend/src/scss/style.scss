@@ -9,6 +9,10 @@ body {
   animation-fill-mode: forwards;
 }
 
+.fs-7 {
+  font-size: 0.8em;
+}
+
 .navbar {
   background-color: #fcf5df;
 }
@@ -36,6 +40,14 @@ body {
   &:hover {
     color: inherit;
   }
+}
+
+.ant-slider-handle-1 {
+  transform: unset !important;
+}
+
+.ant-slider-handle-2 {
+  transform: translateX(-100%) !important;
 }
 
 .modal-bg {
@@ -87,6 +99,10 @@ body {
   width: 60px;
   height: 60px;
 
+  .ant-float-btn-body {
+    background-color: #fff5ee !important;
+  }
+
   .ant-float-btn-icon {
     width: 25px !important;
     font-size: 25px !important;
@@ -103,6 +119,11 @@ body {
     .ant-upload.ant-upload-select {
       margin-right: 0;
     }
+  }
+
+  .ant-result {
+    padding: 0;
+    margin-bottom: 40%;
   }
 
   .price > .discount {
@@ -173,12 +194,36 @@ body {
   scrollbar-width: thin;
 }
 
+.ant-collapse {
+  .ant-collapse-content {
+    background-color: #faf8f5 !important;
+  }
+
+  .ant-collapse-icon-collapsible-only > .ant-collapse-header-text {
+    margin-right: 0 !important;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+}
+
+.ant-drawer-content {
+  background: #fffaf5 !important;
+}
+
 @keyframes show {
   0% { opacity: 0; }
   100% { opacity: 1; }
  }
 
- @media (max-width: 768px) {
+@media (max-width: 1199px) {
+
+  .marketplace {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 767px) {
 
   .marketplace {
     grid-template-columns: repeat(1, 1fr);

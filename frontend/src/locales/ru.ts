@@ -33,7 +33,7 @@ export default {
       submit: 'Войти',
       checkbox: 'Запомнить меня',
       notAccount: 'Нет аккаунта? ',
-      forgotPassword: 'Забыли пароль? ',
+      forgotPassword: 'Забыли пароль?',
       recovery: 'Восстановить',
     },
     recoveryForm: {
@@ -181,6 +181,23 @@ export default {
     search: {
       header: 'Ничего не найдено',
       title: 'По Вашему запросу ничего не найдено',
+    },
+    filters: {
+      title: 'Настроить список товаров',
+      clearFilters: 'Сбросить фильтры',
+      sorts: {
+        title: 'Сортировка',
+        byName: 'По имени',
+        byOverPrice: 'Сначала дороже',
+        byLowerPrice: 'Сначала дешевле',
+      },
+      filters: {
+        title: 'Фильтры',
+        price: 'Цена',
+        ccal: 'Каллории (на 100гр)',
+        from: 'От',
+        to: 'До',
+      },
     },
   },
 };

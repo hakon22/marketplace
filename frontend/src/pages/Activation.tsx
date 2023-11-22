@@ -3,7 +3,7 @@ import { Card, Spinner } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import ActivationForm from '../components/ActivationForm';
+import ActivationForm from '../components/forms/ActivationForm';
 import { fetchActivation } from '../slices/loginSlice';
 import { useAppDispatch, useAppSelector } from '../utilities/hooks';
 import Helmet from '../components/Helmet';
