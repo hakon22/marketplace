@@ -52,7 +52,7 @@ const sortByRangePrice = (priceValue: SliderValue) => (a: Item) => {
       && actualPrice >= priceValue[0] && actualPrice <= priceValue[1];
 };
 
-const sortByRangeCcal = (ccalValue: SliderValue) => (a: Item) => ccalValue?.length && a.foodValues.ccal >= ccalValue[0] && a.foodValues.ccal <= ccalValue[1];
+const sortByRangeCcal = (...values: SliderValue[]) => (a: Item) => values[1]?.length && Number(a.foodValues.ccal) >= values[1][0] && Number(a.foodValues.ccal) <= values[1][1];
 
 const sortByRange = (priceValue: SliderValue, ccalValue: SliderValue) => (a: Item) => {
   const { price, discountPrice, foodValues: { ccal } } = a;

@@ -47,7 +47,7 @@ const Marketplace = ({ filter }: { filter?: string }) => {
   useEffect(() => {
     const fetch = async () => {
       const { payload } = await dispatch(fetchItems());
-      setShowData(payload.items.sort(generalSortFunction).slice(0, showedItemsCount));
+      setShowData(payload.items.sort(generalSortFunction(sortBy)).slice(0, showedItemsCount));
     };
 
     if (!items.length) {
