@@ -21,7 +21,6 @@ router.get(`${apiPath}/activation/repeatEmail/:id`, Activation.repeatEmail);
 router.post(`${apiPath}/activation/changeEmail`, Activation.changeEmail);
 
 router.get(`${apiPath}/market/getAll`, Market.getAll);
-router.post(`${apiPath}/market/upload`, Market.upload);
-router.post(`${apiPath}/market/create`, Market.create);
+router.post(`${apiPath}/market/upload`, passport.authenticate('jwt', { session: false }), Market.upload);
 
 export default router;

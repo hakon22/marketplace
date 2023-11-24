@@ -19,6 +19,7 @@ import {
   ModalLogin, ModalSignup, ModalRecovery, ModalCreateItem,
 } from './Modals';
 import Search from '../pages/Search';
+import Delivery from '../pages/Delivery';
 
 const App = () => {
   const { t } = useTranslation();
@@ -131,7 +132,7 @@ const App = () => {
                 <Routes>
                   <Route path={routes.homePage} element={<Marketplace />} />
                   <Route path={catalogPages.discounts} element={<Marketplace filter="discounts" />} />
-                  <Route path={catalogPages.delivery} element={<Marketplace />} />
+                  <Route path={catalogPages.delivery} element={<Delivery />} />
                   <Route path={catalogPages.vegetables} element={<Marketplace filter="vegetables" />} />
                   <Route path={catalogPages.fruits} element={<Marketplace filter="fruits" />} />
                   <Route path={catalogPages.frozen} element={<Marketplace filter="frozen" />} />

@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next';
+import { Result } from 'antd';
 import { Helmet } from 'react-helmet';
-import { Card, Image } from 'react-bootstrap';
-import lemon from '../images/lemon.svg';
 
 const Page404 = () => {
   const { t } = useTranslation();
@@ -13,16 +12,11 @@ const Page404 = () => {
           <meta name="description" content={t('404.title')} />
           <link rel="canonical" href={window.location.href} />
         </Helmet>
-        <Card border="warning" className="text-center card-bg">
-          <Card.Header>{t('404.header')}</Card.Header>
-          <Card.Body>
-            <Image className="mt-3 mb-4" src={lemon} alt={t('404.header')} roundedCircle />
-            <Card.Title>{t('404.title')}</Card.Title>
-            <Card.Text>
-              {t('404.text')}
-            </Card.Text>
-          </Card.Body>
-        </Card>
+        <Result
+          status="404"
+          title={t('404.title')}
+          subTitle={t('404.description')}
+        />
       </div>
     </div>
   );

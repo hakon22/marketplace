@@ -68,7 +68,7 @@ export default {
     404: {
       header: 'Ошибка 404',
       title: 'Страница не найдена',
-      text: 'Возможно, наши горе-разработчики что-то сломали :(',
+      description: 'Возможно, наши горе-разработчики что-то сломали :(',
     },
     validation: {
       required: 'Обязательное поле',
@@ -93,6 +93,8 @@ export default {
       changeEmailSuccess: 'Почта успешно обновлена',
       doesNotRequireActivation: 'Аккаунт не требует активации',
       createItemSuccess: 'Товар успешно добавлен',
+      removeItemSuccess: 'Товар успешно удалён',
+      editItemSuccess: 'Товар успешно обновлён',
       networkError: 'Ошибка соединения',
       unknownError: 'Неизвестная ошибка',
       authError: 'Ошибка аутентификации',
@@ -154,6 +156,12 @@ export default {
         close: 'Закрыть',
         submitChange: 'Изменить',
       },
+      removeItem: {
+        close: 'Закрыть',
+        remove: 'Удалить',
+        title: 'Удаление товара',
+        body: 'Вы уверены, что хотите удалить товар?',
+      },
       cart: {
         title: 'Ваш заказ:',
         decrease: 'Уменьшить',
@@ -198,6 +206,15 @@ export default {
         from: 'От',
         to: 'До',
       },
+    },
+    contextMenu: {
+      editItem: 'Редактировать товар',
+      removeItem: 'Удалить товар',
+    },
+    delivery: {
+      header: 'Доставка',
+      title: 'В настоящее время доставки нет :)',
+      subTitle: 'Но она обязательно скоро появится!',
     },
   },
 };

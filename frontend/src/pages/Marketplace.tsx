@@ -1,27 +1,34 @@
 /* eslint-disable max-len */
 import {
-  useEffect, useRef, useState, useMemo,
+  useEffect, useState, useMemo, useContext,
 } from 'react';
 import { Spinner, Button } from 'react-bootstrap';
 import { Badge, FloatButton, Result } from 'antd';
 import { useTranslation } from 'react-i18next';
 import Pagination from '../components/Pagination';
 import Card from '../components/Card';
+import { ModalContext } from '../components/Context';
+import { ModalRemoveItem } from '../components/Modals';
 import { fetchItems, selectors } from '../slices/marketSlice';
 import { useAppDispatch, useAppSelector } from '../utilities/hooks';
 import Cart from '../components/Cart';
 import Breadcrumb from '../components/Breadcrumb';
 import Filters, { isFilter, generalSortFunction, generalFilterFunction } from '../components/Filters';
+import CardContextMenu from '../components/CardContextMenu';
 import type { FilterOptions } from '../components/Filters';
 import type { Item } from '../types/Item';
 
 const Marketplace = ({ filter }: { filter?: string }) => {
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
+  const { show, modalClose, modalShow } = useContext(ModalContext);
+  const [context, setContext] = useState<{ action: string, id: number }>();
 
   const showedItemsCount: number = 8;
 
   const { loadingStatus, search } = useAppSelector((state) => state.market);
+  const { role } = useAppSelector((state) => state.login);
+
   const items: Item[] = useAppSelector(selectors.selectAll);
   const currentItems = useMemo(() => items.filter((i) => {
     if (filter) {
@@ -29,8 +36,6 @@ const Marketplace = ({ filter }: { filter?: string }) => {
     }
     return true;
   }), [items, filter, search]);
-
-  const scrollRef = useRef<HTMLDivElement>(null);
 
   const [filterOptions, setFilterOptions] = useState<FilterOptions>({ sortBy: 'name' });
   const { sortBy, rangePriceValue, rangeCcalValue } = filterOptions;
@@ -55,15 +60,22 @@ const Marketplace = ({ filter }: { filter?: string }) => {
     }
   }, []);
 
+  useEffect(() => {
+    if (context?.action) {
+      modalShow('removeItem');
+    }
+  }, [context?.action]);
+
   return loadingStatus !== 'finish' ? (
     <div className="position-absolute top-50 start-50">
       <Spinner animation="border" variant="primary" role="status" />
     </div>
   ) : (
     <>
+      <ModalRemoveItem show={show} onHide={modalClose} context={context} setContext={setContext} />
       <Breadcrumb />
       <div className="my-4 row d-flex justify-content-end">
-        <div className="col-12 col-md-9 col-xl-10 my-4" ref={scrollRef}>
+        <div className="col-12 col-md-9 col-xl-10 my-4">
           <Cart />
           <Filters
             filterOptions={filterOptions}
@@ -75,13 +87,16 @@ const Marketplace = ({ filter }: { filter?: string }) => {
             showedItemsCount={showedItemsCount}
           />
           <div className="marketplace anim-show">
-            {showedData.map((item) => (item.discount
-              ? (
-                <Badge.Ribbon key={item.id} text={<span className="fw-bold">{t('cardItem.discount', { discount: item.discount })}</span>} color="red">
-                  <Card item={item} />
-                </Badge.Ribbon>
-              )
-              : <Card key={item.id} item={item} />
+            {showedData.map((item) => (
+              <CardContextMenu key={item.id} id={item.id} disabled={role !== 'admin'} setContext={setContext}>
+                {item.discount
+                  ? (
+                    <Badge.Ribbon text={<span className="fw-bold">{t('cardItem.discount', { discount: item.discount })}</span>} color="red">
+                      <Card item={item} />
+                    </Badge.Ribbon>
+                  )
+                  : <Card key={item.id} item={item} />}
+              </CardContextMenu>
             ))}
           </div>
           {!showedData.length && isFilter(rangePriceValue, rangeCcalValue) && (
@@ -99,9 +114,8 @@ const Marketplace = ({ filter }: { filter?: string }) => {
             data={sortedItems}
             setShowData={setShowData}
             rowsPerPage={showedItemsCount}
-            scrollRef={scrollRef}
           />
-          <FloatButton.BackTop />
+          <FloatButton.BackTop style={{ right: '6.5%', bottom: '25%' }} />
         </div>
       </div>
     </>

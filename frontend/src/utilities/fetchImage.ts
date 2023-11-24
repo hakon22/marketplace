@@ -1,7 +1,5 @@
-const { hostname } = window.location;
-
 const fetchImage = async (img: string, setState?: React.Dispatch<React.SetStateAction<string>>) => {
-  if (hostname === 'localhost') {
+  if (process.env.NODE_ENV === 'development') {
     const response = await import(`../images/market/${img}`);
     return setState ? setState(response.default) : response.default;
   }

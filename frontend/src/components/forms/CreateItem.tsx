@@ -15,7 +15,7 @@ import axios from 'axios';
 import { SingleValueType } from 'rc-cascader/lib/Cascader';
 import notify from '../../utilities/toast';
 import { marketAdd } from '../../slices/marketSlice';
-import { useAppDispatch } from '../../utilities/hooks';
+import { useAppDispatch, useAppSelector } from '../../utilities/hooks';
 import { createItemValidation } from '../../validations/validations';
 import roundingEldorado from '../../utilities/roundingEldorado';
 import formClass from '../../utilities/formClass';
@@ -34,6 +34,8 @@ const CreateItem = () => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const isMobile = useContext(MobileContext);
+
+  const { token } = useAppSelector((state) => state.login);
 
   const uploadRef = useRef<HTMLDivElement>(null);
   const [isDiscount, setIsDiscount] = useState(false);
@@ -91,6 +93,7 @@ const CreateItem = () => {
           ...rest,
         }, {
           headers: {
+            Authorization: `Bearer ${token}`,
             'Content-Type': 'multipart/form-data',
           },
         });

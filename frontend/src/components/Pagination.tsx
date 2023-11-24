@@ -1,13 +1,14 @@
-import { Pagination as BootstrapPagination } from 'react-bootstrap';
+import { Pagination as AntdPagination } from 'antd';
 import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import scrollTop from '../utilities/scrollTop';
 import type { Item } from '../types/Item';
 
 type PaginationProps<T> = {
   data: T;
   setShowData: React.Dispatch<React.SetStateAction<T>>;
   rowsPerPage: number;
-  scrollRef: React.RefObject<HTMLElement>;
+  scrollRef?: React.RefObject<HTMLElement>;
 }
 
 const Pagination = ({
@@ -38,29 +39,31 @@ const Pagination = ({
     }
   };
 
-  const items: JSX.Element[] = [];
-
-  for (let number = 1; number <= lastPage; number += 1) {
-    items.push(
-      <BootstrapPagination.Item
-        key={number}
-        active={number === currentPage}
-        onClick={() => handleClick(number)}
-      >
-        {number}
-      </BootstrapPagination.Item>,
-    );
-  }
-
   useEffect(() => {
     setTimeout(() => handleClick(pageParams), 1);
   }, [data]);
 
   useEffect(() => {
-    scrollRef.current?.scrollIntoView();
+    if (scrollRef) {
+      scrollRef?.current?.scrollIntoView();
+    } else {
+      setTimeout(scrollTop, 1);
+    }
   }, [currentPage]);
 
-  return <BootstrapPagination className="d-flex justify-content-center align-items-center mt-5">{items}</BootstrapPagination>;
+  return (
+    <AntdPagination
+      className="d-flex justify-content-center align-items-center mt-5"
+      defaultCurrent={currentPage}
+      showSizeChanger={false}
+      onChange={handleClick}
+      total={lastPage * 10}
+    />
+  );
+};
+
+Pagination.defaultProps = {
+  scrollRef: undefined,
 };
 
 export default Pagination;

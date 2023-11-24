@@ -11,14 +11,16 @@ import { useFormik } from 'formik';
 import { Badge, Tooltip } from 'antd';
 import axios from 'axios';
 import { toLower } from 'lodash';
-import { useAppDispatch } from '../utilities/hooks';
+import { useAppDispatch, useAppSelector } from '../utilities/hooks';
 import routes from '../routes';
 import { changeEmailActivation } from '../slices/loginSlice';
 import { cartUpdate, cartRemove, cartRemoveAll } from '../slices/cartSlice';
 import notify from '../utilities/toast';
 import { MobileContext, ScrollContext } from './Context';
 import { emailValidation } from '../validations/validations';
-import { ModalActivateProps, ModalCartProps, ModalProps } from '../types/Modal';
+import type {
+  ModalActivateProps, ModalCartProps, ModalProps, ModalRemoveItemProps,
+} from '../types/Modal';
 import CreateItem from './forms/CreateItem';
 import RecoveryForm from './forms/RecoveryForm';
 import LoginForm from './forms/LoginForm';
@@ -390,6 +392,86 @@ export const ModalOrder = ({ onHide, show }: ModalProps) => {
           >
             {t('modal.changeEmail.close')}
           </Button>
+        </div>
+      </Modal.Body>
+    </Modal>
+  );
+};
+
+export const ModalRemoveItem = ({
+  onHide, show, context, setContext,
+}: ModalRemoveItemProps) => {
+  const { t } = useTranslation();
+  const { setMarginScroll } = useContext(ScrollContext);
+  const { token } = useAppSelector((state) => state.login);
+
+  const formik = useFormik({
+    initialValues: {},
+    onSubmit: async () => {
+      try {
+        const { data } = await axios.delete(routes.removeItem, {
+          params: { id: context?.id },
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (data.code === 1) {
+          onHide();
+          setContext(undefined);
+          notify(t('toast.removeItemSuccess'), 'success');
+        }
+      } catch (e) {
+        notify(t('toast.unknownError'), 'error');
+        console.log(e);
+      }
+    },
+  });
+
+  return (
+    <Modal
+      show={show === 'removeItem'}
+      contentClassName="modal-bg"
+      onHide={() => {
+        onHide();
+        setContext(undefined);
+      }}
+      onEnter={setMarginScroll}
+      onExited={setMarginScroll}
+      centered
+    >
+      <Modal.Header closeButton>
+        <Modal.Title className="text-center w-100">{t('modal.removeItem.title')}</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <p className="lead">{t('modal.removeItem.body')}</p>
+        <div className="d-flex justify-content-end">
+          <Form
+            onSubmit={formik.handleSubmit}
+          >
+            <Button
+              className="me-2"
+              variant="secondary"
+              onClick={() => {
+                onHide();
+                setContext(undefined);
+              }}
+            >
+              {t('modal.removeItem.close')}
+            </Button>
+            <Button
+              variant="danger"
+              type="submit"
+              disabled={formik.isSubmitting}
+            >
+              {formik.isSubmitting ? (
+                <Spinner
+                  as="span"
+                  animation="border"
+                  size="sm"
+                  role="status"
+                  aria-hidden="true"
+                />
+              ) : t('modal.removeItem.remove')}
+            </Button>
+          </Form>
         </div>
       </Modal.Body>
     </Modal>

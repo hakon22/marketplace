@@ -1,7 +1,7 @@
 import { Card as CardBootstrap, Button } from 'react-bootstrap';
 import { PlusCircle, DashCircle } from 'react-bootstrap-icons';
 import { useState, useEffect } from 'react';
-import { Rate } from 'antd';
+import { Rate, Tooltip, Skeleton } from 'antd';
 import { useTranslation } from 'react-i18next';
 import {
   cartAdd, cartUpdate, cartRemove, selectors,
@@ -18,6 +18,7 @@ const Card = ({ item }: CardItemProps) => {
   const { t } = useTranslation();
 
   const [srcImage, setSrcImage] = useState('');
+  const [onLoad, setOnLoad] = useState(false);
   const countInCart = useAppSelector((state) => selectors.selectById(state, id))?.count;
 
   const setCount = (itemId: number, count: number) => (count < 1
@@ -28,15 +29,23 @@ const Card = ({ item }: CardItemProps) => {
     fetchImage(image, setSrcImage);
   }, []);
 
+  useEffect(() => {
+    if (srcImage) {
+      setOnLoad(true);
+    }
+  }, [srcImage]);
+
   return (
     <CardBootstrap className="card-item">
       <div className="card-image mx-auto">
-        <CardBootstrap.Img variant="top" src={srcImage} alt={name} />
+        {onLoad ? <CardBootstrap.Img variant="top" src={srcImage} alt={name} /> : <Skeleton.Image active className="w-100" />}
       </div>
       <CardBootstrap.Body className="pt-0">
         <Rate disabled defaultValue={4.5} />
         <div className="d-flex justify-content-between align-items-center gap-1 mb-3  min-height-55">
-          <CardBootstrap.Title>{name}</CardBootstrap.Title>
+          <Tooltip title={name} color="orange">
+            <CardBootstrap.Title className="truncate">{name}</CardBootstrap.Title>
+          </Tooltip>
           <CardBootstrap.Subtitle className="text-muted">
             {t('cardItem.subtitle', { price: discountPrice || price, unit })}
           </CardBootstrap.Subtitle>

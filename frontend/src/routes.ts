@@ -34,4 +34,6 @@ export default {
   updateTokens: [apiPath, 'auth', 'updateTokens'].join('/'),
   getAllItems: [apiPath, 'market', 'getAll'].join('/'),
   createItem: [apiPath, 'market', 'upload'].join('/'),
+  removeItem: [apiPath, 'market', 'remove'].join('/'),
+  editItem: [apiPath, 'market', 'edit'].join('/'),
 } as ApiUrl;

@@ -131,13 +131,9 @@ body {
   }
 }
 
-.page-link.active, .active > .page-link {
-  background-color: #fbb37e;
-  border-color: #f98622
-}
-
-.page-link {
-  color: #f98622
+.ant-pagination-item-active {
+  background-color: #fbb37e !important;
+  border-color: #f98622 !important;
 }
 
 .card-item {
@@ -149,6 +145,10 @@ body {
 
     .card-img-top {
       width: 100%;
+    }
+
+    .ant-skeleton-image {
+      min-height: 169.2px;
     }
   }
 
@@ -170,6 +170,18 @@ body {
 
   .min-height-55 {
     min-height: 55px;
+
+    .truncate {
+      -webkit-line-clamp: 2;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      flex-basis: max-content;
+    }
+
+    .text-muted {
+      flex-basis: min-content;
+    }
   }
   
   .ant-rate {

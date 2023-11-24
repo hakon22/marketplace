@@ -12,6 +12,7 @@ import { Button } from 'react-bootstrap';
 import type { CollapseProps } from 'antd';
 import { MobileContext } from './Context';
 import type { Item } from '../types/Item';
+import scrollTop from '../utilities/scrollTop';
 
 export type FilterOptions = {
   sortBy?: 'name' | 'overPrice' | 'lowerPrice';
@@ -238,6 +239,10 @@ const Filters = ({
       setShowData(filteredItems.slice(pageShowedData, pageShowedData
         ? filteredItems.length
         : showedItemsCount));
+      scrollTop();
+      if (isMobile) {
+        setShowDrawer(false);
+      }
     }
   }, [rangePriceValue, rangeCcalValue]);
 
@@ -253,6 +258,10 @@ const Filters = ({
           .sort(generalSortFunction(sortBy))
           .slice(pageShowedData, pageShowedData ? sortedItems.length : showedItemsCount));
       }
+      scrollTop();
+      if (isMobile) {
+        setShowDrawer(false);
+      }
     }
   }, [sortBy]);
 
@@ -260,6 +269,10 @@ const Filters = ({
     if (isClear) {
       setRangePriceValues([-Infinity, Infinity]);
       setRangeCcalValues([-Infinity, Infinity]);
+      scrollTop();
+      if (isMobile) {
+        setShowDrawer(false);
+      }
     }
   }, [isClear]);
 
@@ -279,7 +292,6 @@ const Filters = ({
         width="80%"
         onClose={() => setShowDrawer(false)}
         open={showDrawer}
-        getContainer={false}
       >
         <Collapse
           defaultActiveKey={['1']}
@@ -291,7 +303,7 @@ const Filters = ({
   ) : (
     <Collapse
       className="position-absolute start-0"
-      style={{ width: '20%' }}
+      style={{ width: '20vw' }}
       defaultActiveKey={['1']}
       items={items}
       expandIconPosition="end"
