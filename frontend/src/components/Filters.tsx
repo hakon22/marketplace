@@ -43,14 +43,14 @@ const sortByName = (a: Item, b: Item) => {
   return 0;
 };
 
-const sortByOverPrice = (a: Item, b: Item) => b.price - a.price;
-const sortByLowerPrice = (a: Item, b: Item) => a.price - b.price;
+const sortByOverPrice = (a: Item, b: Item) => (b.discountPrice || b.price) - (a.discountPrice || a.price);
+const sortByLowerPrice = (a: Item, b: Item) => (a.discountPrice || a.price) - (b.discountPrice || b.price);
 
 const sortByRangePrice = (priceValue: SliderValue) => (a: Item) => {
   const { price, discountPrice } = a;
   const actualPrice = discountPrice || price;
   return priceValue?.length
-      && actualPrice >= priceValue[0] && actualPrice <= priceValue[1];
+      && (actualPrice >= priceValue[0]) && (actualPrice <= priceValue[1]);
 };
 
 const sortByRangeCcal = (...values: SliderValue[]) => (a: Item) => values[1]?.length && Number(a.foodValues.ccal) >= values[1][0] && Number(a.foodValues.ccal) <= values[1][1];
@@ -59,7 +59,7 @@ const sortByRange = (priceValue: SliderValue, ccalValue: SliderValue) => (a: Ite
   const { price, discountPrice, foodValues: { ccal } } = a;
   const actualPrice = discountPrice || price;
   return (priceValue?.length
-      && actualPrice >= priceValue[0] && actualPrice <= priceValue[1])
+      && (actualPrice >= priceValue[0]) && (actualPrice <= priceValue[1]))
       && (ccalValue?.length && ccal >= ccalValue[0] && ccal <= ccalValue[1]);
 };
 

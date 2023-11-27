@@ -86,6 +86,7 @@ export default {
       imageRequired: 'Необходимо загрузить изображение',
       imagePngType: 'Разрешён только формат PNG',
       imageNoMore200kb: 'Размер файла не должен превышать 200КБ',
+      itemNameAlreadyExists: 'Такое имя товара уже существует',
     },
     toast: {
       activationSuccess: 'Аккаунт успешно активирован',
@@ -94,6 +95,7 @@ export default {
       doesNotRequireActivation: 'Аккаунт не требует активации',
       createItemSuccess: 'Товар успешно добавлен',
       removeItemSuccess: 'Товар успешно удалён',
+      removeItemError: 'Товара не существует',
       editItemSuccess: 'Товар успешно обновлён',
       networkError: 'Ошибка соединения',
       unknownError: 'Неизвестная ошибка',
@@ -125,6 +127,8 @@ export default {
       updatePrice: 'Обновить цену',
       adding: 'Добавление...',
       addItem: 'Добавить товар',
+      updateItem: 'Обновить товар',
+      updating: 'Обновление...',
       selectCategory: 'Выберите категорию',
       category: {
         vegetables: 'Овощи',

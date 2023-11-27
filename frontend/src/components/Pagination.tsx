@@ -47,17 +47,18 @@ const Pagination = ({
     if (scrollRef) {
       scrollRef?.current?.scrollIntoView();
     } else {
-      setTimeout(scrollTop, 1);
+      setTimeout(scrollTop, 100);
     }
   }, [currentPage]);
 
   return (
     <AntdPagination
       className="d-flex justify-content-center align-items-center mt-5"
-      defaultCurrent={currentPage}
+      current={currentPage}
       showSizeChanger={false}
       onChange={handleClick}
       total={lastPage * 10}
+      disabled={!lastPage}
     />
   );
 };

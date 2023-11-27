@@ -7,8 +7,8 @@ import { Badge, FloatButton, Result } from 'antd';
 import { useTranslation } from 'react-i18next';
 import Pagination from '../components/Pagination';
 import Card from '../components/Card';
-import { ModalContext } from '../components/Context';
-import { ModalRemoveItem } from '../components/Modals';
+import { ModalContext, ScrollContext } from '../components/Context';
+import { ModalCreateItem, ModalRemoveItem } from '../components/Modals';
 import { fetchItems, selectors } from '../slices/marketSlice';
 import { useAppDispatch, useAppSelector } from '../utilities/hooks';
 import Cart from '../components/Cart';
@@ -21,6 +21,7 @@ import type { Item } from '../types/Item';
 const Marketplace = ({ filter }: { filter?: string }) => {
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
+  const { scrollBar } = useContext(ScrollContext);
   const { show, modalClose, modalShow } = useContext(ModalContext);
   const [context, setContext] = useState<{ action: string, id: number }>();
 
@@ -61,8 +62,8 @@ const Marketplace = ({ filter }: { filter?: string }) => {
   }, []);
 
   useEffect(() => {
-    if (context?.action) {
-      modalShow('removeItem');
+    if (context?.action === 'editItem' || context?.action === 'removeItem') {
+      modalShow(context?.action);
     }
   }, [context?.action]);
 
@@ -72,6 +73,7 @@ const Marketplace = ({ filter }: { filter?: string }) => {
     </div>
   ) : (
     <>
+      <ModalCreateItem onHide={modalClose} context={context} setContext={setContext} />
       <ModalRemoveItem show={show} onHide={modalClose} context={context} setContext={setContext} />
       <Breadcrumb />
       <div className="my-4 row d-flex justify-content-end">
@@ -115,7 +117,7 @@ const Marketplace = ({ filter }: { filter?: string }) => {
             setShowData={setShowData}
             rowsPerPage={showedItemsCount}
           />
-          <FloatButton.BackTop style={{ right: '6.5%', bottom: '25%' }} />
+          <FloatButton.BackTop style={{ right: '6.5%', bottom: '25%', marginRight: scrollBar }} />
         </div>
       </div>
     </>

@@ -113,3 +113,40 @@ export const createItemValidation = yup.object().shape({
     .array()
     .min(1, 'createItem.selectCategory'),
 });
+
+export const editItemValidation = yup.object().shape({
+  name: yup
+    .string()
+    .trim()
+    .required()
+    .min(3),
+  unit: yup
+    .string()
+    .required(),
+  count: yup
+    .string()
+    .required(),
+  price: yup
+    .string()
+    .required(),
+  composition: yup
+    .string()
+    .required(),
+  foodValues: yup.object().shape({
+    carbohydrates: yup
+      .string()
+      .required(),
+    fats: yup
+      .string()
+      .required(),
+    proteins: yup
+      .string()
+      .required(),
+    ccal: yup
+      .string()
+      .required(),
+  }),
+  category: yup
+    .array()
+    .min(1, 'createItem.selectCategory'),
+});

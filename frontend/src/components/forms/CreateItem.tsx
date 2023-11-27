@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import {
   Form, Button, Card, InputGroup, Spinner,
 } from 'react-bootstrap';
@@ -14,13 +15,15 @@ import {
 import axios from 'axios';
 import { SingleValueType } from 'rc-cascader/lib/Cascader';
 import notify from '../../utilities/toast';
-import { marketAdd } from '../../slices/marketSlice';
+import { marketAdd, marketUpdate, selectors } from '../../slices/marketSlice';
 import { useAppDispatch, useAppSelector } from '../../utilities/hooks';
-import { createItemValidation } from '../../validations/validations';
+import { createItemValidation, editItemValidation } from '../../validations/validations';
 import roundingEldorado from '../../utilities/roundingEldorado';
 import formClass from '../../utilities/formClass';
 import { MobileContext } from '../Context';
 import routes from '../../routes';
+import { SetContext } from '../CardContextMenu';
+import fetchImage from '../../utilities/fetchImage';
 
 interface Option {
   value: string;
@@ -30,10 +33,12 @@ interface Option {
 
 const displayRender = (labels: string[]) => labels[labels.length - 1];
 
-const CreateItem = () => {
+const CreateItem = ({ id, setContext }: { id?: number, setContext?: SetContext }) => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const isMobile = useContext(MobileContext);
+
+  const item = useAppSelector((state) => selectors.selectById(state, id || 0));
 
   const { token } = useAppSelector((state) => state.login);
 
@@ -61,33 +66,59 @@ const CreateItem = () => {
 
   const categories: Option[] = fetchOptions(t('createItem.category', { returnObjects: true }));
 
-  const formik = useFormik({
-    initialValues: {
-      image: '',
-      name: '',
-      unit: 'кг',
-      count: '',
-      price: '',
-      discountPrice: '',
-      composition: '',
-      foodValues: {
-        carbohydrates: '',
-        fats: '',
-        proteins: '',
-        ccal: '',
-      },
-      discount: '',
-      category: [],
+  const initialValues = item ? {
+    image: item?.image,
+    name: item?.name,
+    unit: item?.unit,
+    count: String(item?.count),
+    price: String(item?.price),
+    discountPrice: item?.discountPrice ? String(item?.discountPrice) : '',
+    composition: item?.composition,
+    foodValues: {
+      carbohydrates: String(item?.foodValues.carbohydrates),
+      fats: String(item?.foodValues.fats),
+      proteins: String(item?.foodValues.proteins),
+      ccal: String(item?.foodValues.ccal),
     },
-    validationSchema: createItemValidation,
-    onSubmit: async (values, { resetForm, setFieldValue }) => {
+    discount: item?.discount ? String(item?.discount) : '',
+    category: item?.category,
+  } : {
+    image: '',
+    name: '',
+    unit: 'кг',
+    count: '',
+    price: '',
+    discountPrice: '',
+    composition: '',
+    foodValues: {
+      carbohydrates: '',
+      fats: '',
+      proteins: '',
+      ccal: '',
+    },
+    discount: '',
+    category: [],
+  };
+
+  const formik = useFormik({
+    initialValues,
+    validationSchema: fileList?.[0]?.uid === '-1' ? editItemValidation : createItemValidation,
+    onSubmit: async (values, {
+      resetForm, setFieldValue, setFieldError, setSubmitting,
+    }) => {
       try {
         if (!values.discount) {
           values.discount = '0';
           values.discountPrice = '0';
         }
         const { foodValues, category, ...rest } = values;
-        const { data } = await axios.post(routes.createItem, {
+        const { data } = await axios.post(item ? routes.editItem : routes.createItem, item ? {
+          foodValues: JSON.stringify(foodValues),
+          category: JSON.stringify(category),
+          id,
+          oldImage: item.image,
+          ...rest,
+        } : {
           foodValues: JSON.stringify(foodValues),
           category: JSON.stringify(category),
           ...rest,
@@ -98,14 +129,40 @@ const CreateItem = () => {
           },
         });
         if (data.code === 1) {
-          dispatch(marketAdd(data.item));
-          setFieldValue('image', '');
-          setFieldValue('category', []);
-          setFileList([]);
-          resetForm();
-          notify(t('toast.createItemSuccess'), 'success');
+          if (id && setContext) {
+            const {
+              price, discountPrice, count, discount,
+            } = data.item;
+            dispatch(marketUpdate({
+              id,
+              changes: {
+                ...data.item,
+                id,
+                price: Number(price),
+                discountPrice: Number(discountPrice),
+                count: Number(count),
+                discount: Number(discount),
+              },
+            }));
+            setContext(undefined);
+            notify(t('toast.editItemSuccess'), 'success');
+          } else {
+            dispatch(marketAdd(data.item));
+            setFieldValue('image', '');
+            setFieldValue('category', []);
+            setFileList([]);
+            resetForm();
+            notify(t('toast.createItemSuccess'), 'success');
+          }
+        } else if (data.code === 2) {
+          setFieldError('name', t('validation.itemNameAlreadyExists'));
+          setSubmitting(false);
         }
       } catch (e) {
+        if (values.discount === '0') {
+          values.discount = '';
+          values.discountPrice = '';
+        }
         notify(t('toast.unknownError'), 'error');
         console.log(e);
       }
@@ -136,6 +193,19 @@ const CreateItem = () => {
       uploadContainer?.classList.remove('border', 'border-danger');
     }
   }, [formik.errors.image, formik.submitCount]);
+
+  useEffect(() => {
+    if (item) {
+      fetchImage(item.image).then((image) => {
+        setFileList([{
+          uid: '-1',
+          name: item.image,
+          status: 'done',
+          url: image,
+        }]);
+      }).catch((e) => console.log(e));
+    }
+  }, []);
 
   return (
     <div className="marketplace d-flex justify-content-center">
@@ -168,7 +238,7 @@ const CreateItem = () => {
                   return false;
                 }}
               >
-                {!formik.values.image && (
+                {!fileList?.length && (
                 <div>
                   <PlusOutlined className="mb-2" />
                   <div>{t('createItem.upload')}</div>
@@ -426,10 +496,10 @@ const CreateItem = () => {
                           role="status"
                           aria-hidden="true"
                         />
-                        {t('createItem.adding')}
+                        {item ? t('createItem.updating') : t('createItem.adding')}
                       </>
                     )
-                    : t('createItem.addItem')}
+                    : item ? t('createItem.updateItem') : t('createItem.addItem')}
                 </Button>
               )}
             </div>
@@ -438,6 +508,11 @@ const CreateItem = () => {
       </Form>
     </div>
   );
+};
+
+CreateItem.defaultProps = {
+  id: undefined,
+  setContext: undefined,
 };
 
 export default CreateItem;

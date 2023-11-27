@@ -53,7 +53,7 @@ const Card = ({ item }: CardItemProps) => {
         <CardBootstrap.Text as="div" className="fs-bold mb-3">
           {discount
             ? (
-              <div className="d-flex gap-4 price d-flex align-items-center">
+              <div className="d-flex gap-1 price d-flex align-items-center justify-content-between">
                 <span className="fs-6 text-muted discount">{t('cardItem.price', { price })}</span>
                 <span className="fs-4 text-danger">{t('cardItem.price', { price: discountPrice })}</span>
               </div>

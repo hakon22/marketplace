@@ -20,6 +20,11 @@ export type ModalRemoveItemProps = ModalProps & {
   setContext: SetContext;
 }
 
+export type ModalEditItemProps = ModalProps & {
+  context?: Context;
+  setContext?: SetContext;
+}
+
 export type ModalCartProps = ModalProps & {
   items: (Cart | undefined)[];
   priceAndCount: PriceAndCount;

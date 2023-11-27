@@ -31,6 +31,7 @@ const marketSlice = createSlice({
   reducers: {
     marketAdd: marketAdapter.addOne,
     marketUpdate: marketAdapter.updateOne,
+    marketRemove: marketAdapter.removeOne,
     searchUpdate: (state, { payload }: PayloadAction<Item[] | null>) => {
       state.search = payload;
     },
@@ -56,7 +57,9 @@ const marketSlice = createSlice({
   },
 });
 
-export const { marketAdd, marketUpdate, searchUpdate } = marketSlice.actions;
+export const {
+  marketAdd, marketUpdate, marketRemove, searchUpdate,
+} = marketSlice.actions;
 
 export const selectors = marketAdapter.getSelectors<RootState>((state) => state.market);
 

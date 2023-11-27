@@ -14,12 +14,15 @@ import { toLower } from 'lodash';
 import { useAppDispatch, useAppSelector } from '../utilities/hooks';
 import routes from '../routes';
 import { changeEmailActivation } from '../slices/loginSlice';
-import { cartUpdate, cartRemove, cartRemoveAll } from '../slices/cartSlice';
+import {
+  cartUpdate, cartRemove, cartRemoveAll, selectors,
+} from '../slices/cartSlice';
+import { marketRemove } from '../slices/marketSlice';
 import notify from '../utilities/toast';
 import { MobileContext, ScrollContext } from './Context';
 import { emailValidation } from '../validations/validations';
 import type {
-  ModalActivateProps, ModalCartProps, ModalProps, ModalRemoveItemProps,
+  ModalActivateProps, ModalCartProps, ModalProps, ModalRemoveItemProps, ModalEditItemProps,
 } from '../types/Modal';
 import CreateItem from './forms/CreateItem';
 import RecoveryForm from './forms/RecoveryForm';
@@ -235,24 +238,31 @@ export const ModalSignup = ({ onHide, show }: ModalProps) => {
   );
 };
 
-export const ModalCreateItem = ({ onHide, show }: ModalProps) => {
+export const ModalCreateItem = ({
+  onHide, show, context, setContext,
+}: ModalEditItemProps) => {
   const { t } = useTranslation();
   const { setMarginScroll } = useContext(ScrollContext);
 
   return (
     <Modal
-      show={show === 'createItem'}
+      show={show === 'createItem' || context?.action === 'editItem'}
       contentClassName="modal-bg"
-      onHide={onHide}
+      onHide={() => {
+        onHide();
+        if (setContext) {
+          setContext(undefined);
+        }
+      }}
       onEnter={setMarginScroll}
       onExited={setMarginScroll}
       centered
     >
       <Modal.Header closeButton>
-        <Modal.Title className="text-center w-100">{t('createItem.title')}</Modal.Title>
+        <Modal.Title className="text-center w-100">{setContext ? t('createItem.updateItem') : t('createItem.title')}</Modal.Title>
       </Modal.Header>
       <Modal.Body className="d-flex justify-content-center">
-        <CreateItem />
+        <CreateItem id={context?.id} setContext={setContext} />
       </Modal.Body>
     </Modal>
   );
@@ -402,6 +412,12 @@ export const ModalRemoveItem = ({
   onHide, show, context, setContext,
 }: ModalRemoveItemProps) => {
   const { t } = useTranslation();
+  const dispatch = useAppDispatch();
+
+  const id = context?.id ?? 0;
+
+  const itemInCart = useAppSelector((state) => selectors.selectById(state, id));
+
   const { setMarginScroll } = useContext(ScrollContext);
   const { token } = useAppSelector((state) => state.login);
 
@@ -410,13 +426,21 @@ export const ModalRemoveItem = ({
     onSubmit: async () => {
       try {
         const { data } = await axios.delete(routes.removeItem, {
-          params: { id: context?.id },
+          params: { id },
           headers: { Authorization: `Bearer ${token}` },
         });
         if (data.code === 1) {
+          dispatch(marketRemove(id));
+          if (itemInCart) {
+            dispatch(cartRemove(id));
+          }
           onHide();
           setContext(undefined);
           notify(t('toast.removeItemSuccess'), 'success');
+        } else if (data.code === 2) {
+          onHide();
+          setContext(undefined);
+          notify(t('toast.removeItemError'), 'error');
         }
       } catch (e) {
         notify(t('toast.unknownError'), 'error');
@@ -476,6 +500,10 @@ export const ModalRemoveItem = ({
       </Modal.Body>
     </Modal>
   );
+};
+
+ModalCreateItem.defaultProps = {
+  id: undefined,
 };
 
 export default ModalChangeActivationEmail;

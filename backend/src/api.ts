@@ -22,5 +22,7 @@ router.post(`${apiPath}/activation/changeEmail`, Activation.changeEmail);
 
 router.get(`${apiPath}/market/getAll`, Market.getAll);
 router.post(`${apiPath}/market/upload`, passport.authenticate('jwt', { session: false }), Market.upload);
+router.post(`${apiPath}/market/edit`, passport.authenticate('jwt', { session: false }), Market.edit);
+router.delete(`${apiPath}/market/remove`, passport.authenticate('jwt', { session: false }), Market.remove);
 
 export default router;
