@@ -32,11 +32,11 @@ const ProfileButton = ({ className }: { className?: string }) => {
               {t('createItem.addItem')}
             </NavDropdown.Item>
           )}
-          <NavDropdown.Item href="#">
+          <NavDropdown.Item href="/marketplace/profile">
             <PersonCircle />
             {t('profileButton.profile')}
           </NavDropdown.Item>
-          <NavDropdown.Item href="#">
+          <NavDropdown.Item href="/marketplace/orders">
             <CartCheck />
             {t('profileButton.myOrders')}
           </NavDropdown.Item>

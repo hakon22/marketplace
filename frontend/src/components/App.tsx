@@ -20,6 +20,7 @@ import {
 } from './Modals';
 import Search from '../pages/Search';
 import Delivery from '../pages/Delivery';
+import MyProfile from '../pages/MyProfile';
 
 const App = () => {
   const { t } = useTranslation();
@@ -144,6 +145,7 @@ const App = () => {
                     <Route path={catalogPages.iceCream} element={<Marketplace filter="iceCream" />} />
                     <Route path={catalogPages.chocolate} element={<Marketplace filter="chocolate" />} />
                   </Route>
+                  <Route path="/profile" element={<MyProfile />} />
                   <Route path={routes.searchPage} element={<Search />} />
                   <Route path={routes.activationPage} element={<Activation />} />
                   <Route path={routes.notFoundPage} element={<Page404 />} />

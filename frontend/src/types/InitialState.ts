@@ -8,5 +8,7 @@ export type InitialStateType = {
   refreshToken?: string;
   email?: string;
   username?: string;
+  phone?: string;
+  role?: string;
   [key: string]: string | number | null | undefined;
 }
