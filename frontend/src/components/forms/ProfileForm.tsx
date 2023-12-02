@@ -1,20 +1,17 @@
-import { Form, Button, Nav } from 'react-bootstrap';
-import { useState, useEffect, useContext } from 'react';
+import { Form, Button } from 'react-bootstrap';
+import { useState, useEffect } from 'react';
 import InputMask from 'react-input-mask';
 import { useTranslation } from 'react-i18next';
 import { useFormik } from 'formik';
-import { useAppDispatch, useAppSelector } from '../../utilities/hooks';
+import { useAppDispatch } from '../../utilities/hooks';
+import type { InitialStateType } from '../../types/InitialState';
 import { signupValidation } from '../../validations/validations';
-import { ModalContext } from '../Context';
 
-const ProfileForm = () => {
+const ProfileForm = ({ user }: { user: InitialStateType }) => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
-  const { modalShow } = useContext(ModalContext);
 
-  const {
-    username, email, phone, loadingStatus,
-  } = useAppSelector((state) => state.login);
+  const { username, email, phone } = user;
 
   const [isChange, setIsChange] = useState(false);
 
@@ -36,13 +33,7 @@ const ProfileForm = () => {
     },
   });
 
-  useEffect(() => {
-    if (!username) {
-      modalShow('login');
-    }
-  }, []);
-
-  return username && loadingStatus === 'finish' ? (
+  return (
     <div className="d-flex justify-content-between">
       <Form onSubmit={formik.handleSubmit} className="col-12 col-md-5">
         <Form.Group className="mb-3 d-flex align-items-center gap-2" controlId="username">
@@ -102,7 +93,7 @@ const ProfileForm = () => {
           <Form.Label className="col-12 col-md-4">Пароль</Form.Label>
           <Form.Control
             type="password"
-            placeholder="Пароль"
+            placeholder="••••••"
             value={formik.values.password}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
@@ -133,20 +124,27 @@ const ProfileForm = () => {
           </Form.Control.Feedback>
         </Form.Group>
         <div className="d-flex justify-content-center">
-          <Button variant="warning" onClick={() => setIsChange(true)}>Изменить данные</Button>
+          {!isChange && <Button variant="warning" onClick={() => setIsChange(true)}>Изменить данные</Button>}
+          {isChange && (
+          <div className="d-flex w-100 justify-content-between">
+            <Button variant="success" type="submit">Сохранить</Button>
+            <Button
+              variant="danger"
+              onClick={() => {
+                formik.resetForm();
+                setIsChange(false);
+              }}
+            >
+              Отмена
+            </Button>
+          </div>
+          )}
         </div>
       </Form>
       <div className="col-12 col-md-5 d-flex flex-column justify-content-center align-items-center">
         <h5 className="mb-3">Мои адреса:</h5>
         <Button variant="warning" onClick={() => setIsChange(true)}>Добавить адрес</Button>
       </div>
-    </div>
-  ) : (
-    <div className="d-flex justify-content-center align-items-center">
-      {t('profile.entrace1')}
-      <Nav role="button" className="nav-link px-2" onClick={() => modalShow('login')}>войдите</Nav>
-      {t('profile.entrace2')}
-      <Nav role="button" className="nav-link ps-2" onClick={() => modalShow('signup')}>зарегистрируйтесь</Nav>
     </div>
   );
 };
