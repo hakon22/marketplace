@@ -150,3 +150,66 @@ export const editItemValidation = yup.object().shape({
     .array()
     .min(1, 'createItem.selectCategory'),
 });
+
+export const profileValidation = yup.object().shape({
+  username: yup
+    .string()
+    .trim()
+    .required()
+    .min(3)
+    .max(20),
+  email: yup
+    .string()
+    .email()
+    .trim()
+    .required(),
+  phone: yup
+    .string()
+    .trim()
+    .required()
+    .transform((value) => value.replace(/[^\d]/g, ''))
+    .length(11),
+  password: yup.string().when('password', ([value]) => {
+    if (value) {
+      return yup
+        .string()
+        .required()
+        .min(6, 'validation.passMin');
+    }
+    return yup
+      .string()
+      .transform((v, originalValue) => (v ? originalValue : null))
+      .nullable()
+      .optional();
+  }),
+  confirmPassword: yup.string().when('password', ([value]) => {
+    if (value) {
+      return yup
+        .string()
+        .required()
+        .oneOf([yup.ref('password')]);
+    }
+    return yup
+      .string()
+      .transform((v, originalValue) => (v ? originalValue : null))
+      .nullable()
+      .optional();
+  }),
+  oldPassword: yup.string().when('password', ([value]) => {
+    if (value) {
+      return yup
+        .string()
+        .required()
+        .min(6, 'validation.passMin');
+    }
+    return yup
+      .string()
+      .transform((v, originalValue) => (v ? originalValue : null))
+      .nullable()
+      .optional();
+  }),
+}, [
+  ['password', 'password'],
+  ['confirmPassword', 'confirmPassword'],
+  ['oldPassword', 'oldPassword'],
+]);
