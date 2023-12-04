@@ -3,7 +3,7 @@ import path from 'path';
 import { Op } from 'sequelize';
 import { unlink } from 'fs';
 import sharp from 'sharp';
-import type { PassportRequest } from 'src/db/tables/Users.js';
+import type { PassportRequest } from '../db/tables/Users.js';
 import { uploadFilesPath } from '../../server.js';
 import Items_Table from '../db/tables/Items.js';
 

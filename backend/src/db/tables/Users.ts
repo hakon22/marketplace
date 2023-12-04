@@ -2,6 +2,16 @@ import { DataTypes, Model, InferAttributes, InferCreationAttributes, CreationOpt
 import { Request } from 'express';
 import { db } from '../connect.js';
 
+type Address = {
+  city: string;
+  street: string;
+  house: number;
+  building?: number;
+  floor?: number;
+  frontDoor?: number;
+  apartment?: number;
+};
+
 interface UserModel extends Model<InferAttributes<UserModel>, InferCreationAttributes<UserModel>> {
   id?: CreationOptional<number>;
   username: string;
@@ -11,6 +21,9 @@ interface UserModel extends Model<InferAttributes<UserModel>, InferCreationAttri
   role: string;
   refresh_token: string[];
   code_activation: number;
+  change_email_code: number;
+  addresses: Address[];
+  orders: number[];
   createdAt?: string;
   updatedAt?: string;
 }
@@ -53,6 +66,18 @@ const Users = db.define<UserModel>(
     },
     code_activation: {
       type: DataTypes.INTEGER,
+    },
+    change_email_code: {
+      type: DataTypes.INTEGER,
+      defaultValue: null,
+    },
+    addresses: {
+      type: DataTypes.ARRAY(DataTypes.JSONB),
+      defaultValue: [],
+    },
+    orders: {
+      type: DataTypes.ARRAY(DataTypes.INTEGER),
+      defaultValue: [],
     },
   },
 );

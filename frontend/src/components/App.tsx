@@ -145,7 +145,8 @@ const App = () => {
                     <Route path={catalogPages.iceCream} element={<Marketplace filter="iceCream" />} />
                     <Route path={catalogPages.chocolate} element={<Marketplace filter="chocolate" />} />
                   </Route>
-                  <Route path="/profile" element={<MyProfile />} />
+                  <Route path={routes.profilePage} element={<MyProfile />} />
+                  <Route path={routes.ordersPage} element={<Page404 />} />
                   <Route path={routes.searchPage} element={<Search />} />
                   <Route path={routes.activationPage} element={<Activation />} />
                   <Route path={routes.notFoundPage} element={<Page404 />} />

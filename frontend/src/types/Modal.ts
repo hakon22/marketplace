@@ -3,7 +3,7 @@ import type { Context, SetContext } from '../components/CardContextMenu';
 
 export type ModalCloseType = 'order' | 'recovery' | 'login' | 'signup' | boolean;
 
-export type ModalShowType = ModalCloseType | 'cart' | 'activation' | 'createItem' | 'removeItem' | 'editItem';
+export type ModalShowType = ModalCloseType | 'cart' | 'activation' | 'createItem' | 'removeItem' | 'editItem' | 'confirmEmail';
 
 export type ModalProps = {
   onHide: (arg?: ModalCloseType) => void;
@@ -23,6 +23,10 @@ export type ModalRemoveItemProps = ModalProps & {
 export type ModalEditItemProps = ModalProps & {
   context?: Context;
   setContext?: SetContext;
+}
+
+export type ModalConfirmEmailProps = ModalProps & {
+  setIsConfirmed: (arg: boolean) => void;
 }
 
 export type ModalCartProps = ModalProps & {

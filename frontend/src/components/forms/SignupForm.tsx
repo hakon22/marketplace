@@ -35,7 +35,7 @@ const SignupForm = () => {
           navigate(`${routes.activationUrlPage}${id}`);
         } else if (code === 2) {
           setSubmitting(false);
-          errorsFields.forEach((field: ('email' | 'phone')) => {
+          errorsFields.forEach((field: 'email' | 'phone') => {
             setFieldError(field, t('validation.userAlreadyExists'));
           });
         } else if (!code) {

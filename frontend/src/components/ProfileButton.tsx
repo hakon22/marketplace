@@ -5,9 +5,11 @@ import {
 import { useContext } from 'react';
 import { Avatar } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
+import { Link } from 'react-router-dom';
 import { NavDropdown } from 'react-bootstrap';
 import { useAppSelector } from '../utilities/hooks';
 import AuthContext, { ModalContext } from './Context';
+import routes from '../routes';
 
 const ProfileButton = ({ className }: { className?: string }) => {
   const { t } = useTranslation();
@@ -32,11 +34,11 @@ const ProfileButton = ({ className }: { className?: string }) => {
               {t('createItem.addItem')}
             </NavDropdown.Item>
           )}
-          <NavDropdown.Item href="/marketplace/profile">
+          <NavDropdown.Item as={Link} to={routes.profilePage}>
             <PersonCircle />
             {t('profileButton.profile')}
           </NavDropdown.Item>
-          <NavDropdown.Item href="/marketplace/orders">
+          <NavDropdown.Item as={Link} to={routes.ordersPage}>
             <CartCheck />
             {t('profileButton.myOrders')}
           </NavDropdown.Item>

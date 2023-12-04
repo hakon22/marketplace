@@ -23,6 +23,8 @@ export default {
   activationPage: '/activation/:id',
   activationUrlPage: '/activation/',
   searchPage: '/search',
+  profilePage: '/profile',
+  ordersPage: '/orders',
   notFoundPage: '*',
   login: [apiPath, 'auth', 'login'].join('/'),
   signup: [apiPath, 'auth', 'signup'].join('/'),
@@ -36,4 +38,6 @@ export default {
   createItem: [apiPath, 'market', 'upload'].join('/'),
   removeItem: [apiPath, 'market', 'remove'].join('/'),
   editItem: [apiPath, 'market', 'edit'].join('/'),
+  confirmEmail: [apiPath, 'profile', 'confirmEmail'].join('/'),
+  changeData: [apiPath, 'profile', 'changeData'].join('/'),
 } as ApiUrl;

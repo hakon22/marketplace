@@ -93,6 +93,7 @@ export default {
       emailSuccess: 'Сообщение успешно отправлено',
       changeEmailSuccess: 'Почта успешно обновлена',
       doesNotRequireActivation: 'Аккаунт не требует активации',
+      changeDataSuccess: 'Данные успешно изменены',
       createItemSuccess: 'Товар успешно добавлен',
       removeItemSuccess: 'Товар успешно удалён',
       removeItemError: 'Товара не существует',
@@ -178,6 +179,12 @@ export default {
         clearCart: 'Очистить корзину',
         orderAccept: 'Заказ принят!',
         gratitude: 'Спасибо за заказ!',
+      },
+      confirmEmail: {
+        title: 'Проверка почты',
+        body: 'На указанный Вами адрес электронной почты был отправлен код подтверждения.',
+        cancel: 'Отмена',
+        submit: 'Подтвердить',
       },
     },
     cart: {

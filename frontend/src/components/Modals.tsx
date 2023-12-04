@@ -1,6 +1,6 @@
 import { useRef, useContext } from 'react';
 import {
-  Form, Modal, Button, Spinner, Alert,
+  Form, Modal, Button, Spinner, Alert, FloatingLabel,
 } from 'react-bootstrap';
 import {
   PlusCircle, DashCircle, XCircle, Check2Circle,
@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useFormik } from 'formik';
 import { Badge, Tooltip } from 'antd';
+import InputMask from 'react-input-mask';
 import axios from 'axios';
 import { toLower } from 'lodash';
 import { useAppDispatch, useAppSelector } from '../utilities/hooks';
@@ -22,7 +23,12 @@ import notify from '../utilities/toast';
 import { MobileContext, ScrollContext } from './Context';
 import { emailValidation } from '../validations/validations';
 import type {
-  ModalActivateProps, ModalCartProps, ModalProps, ModalRemoveItemProps, ModalEditItemProps,
+  ModalActivateProps,
+  ModalCartProps,
+  ModalProps,
+  ModalRemoveItemProps,
+  ModalEditItemProps,
+  ModalConfirmEmailProps,
 } from '../types/Modal';
 import CreateItem from './forms/CreateItem';
 import RecoveryForm from './forms/RecoveryForm';
@@ -498,6 +504,101 @@ export const ModalRemoveItem = ({
           </Form>
         </div>
       </Modal.Body>
+    </Modal>
+  );
+};
+
+export const ModalConfirmEmail = ({ onHide, show, setIsConfirmed }: ModalConfirmEmailProps) => {
+  const { t } = useTranslation();
+
+  const { setMarginScroll } = useContext(ScrollContext);
+  const { token } = useAppSelector((state) => state.login);
+
+  const formik = useFormik({
+    initialValues: {
+      code: '',
+    },
+    onSubmit: async (value, { setSubmitting, setFieldError }) => {
+      try {
+        const { data } = await axios.post(routes.confirmEmail, value, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (data.code === 1) {
+          setIsConfirmed(true);
+          onHide();
+        } else if (data.code === 2) {
+          setSubmitting(false);
+          setFieldError('code', t('validation.incorrectCode'));
+        }
+      } catch (e) {
+        notify(t('toast.unknownError'), 'error');
+        console.log(e);
+      }
+    },
+  });
+
+  return (
+    <Modal
+      show={show === 'confirmEmail'}
+      contentClassName="modal-bg"
+      onHide={onHide}
+      onEnter={setMarginScroll}
+      onExited={setMarginScroll}
+      centered
+    >
+      <Modal.Header closeButton>
+        <Modal.Title className="text-center w-100">{t('modal.confirmEmail.title')}</Modal.Title>
+      </Modal.Header>
+      <Form
+        onSubmit={formik.handleSubmit}
+      >
+        <Modal.Body>
+          <p className="lead text-center mb-4">{t('modal.confirmEmail.body')}</p>
+          <FloatingLabel className="mb-3 col-md-6 mx-auto" label={t('activationForm.code')} controlId="code">
+            <Form.Control
+              autoFocus
+              as={InputMask}
+              mask="9999"
+              type="text"
+              onChange={formik.handleChange}
+              value={formik.values.code}
+              disabled={formik.isSubmitting}
+              isInvalid={!!(formik.errors.code && formik.submitCount)}
+              onBlur={formik.handleBlur}
+              name="code"
+              autoComplete="off"
+              placeholder={t('activationForm.code')}
+            />
+            <Form.Control.Feedback type="invalid" tooltip className="anim-show">
+              {t(formik.errors.code ?? '')}
+            </Form.Control.Feedback>
+          </FloatingLabel>
+        </Modal.Body>
+        <Modal.Footer className="d-flex justify-content-end">
+          <Button
+            variant="success"
+            type="submit"
+            disabled={formik.isSubmitting}
+          >
+            {formik.isSubmitting ? (
+              <Spinner
+                as="span"
+                animation="border"
+                size="sm"
+                role="status"
+                aria-hidden="true"
+              />
+            ) : t('modal.confirmEmail.submit')}
+          </Button>
+          <Button
+            className="me-2"
+            variant="secondary"
+            onClick={() => onHide()}
+          >
+            {t('modal.confirmEmail.cancel')}
+          </Button>
+        </Modal.Footer>
+      </Form>
     </Modal>
   );
 };
