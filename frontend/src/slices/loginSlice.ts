@@ -73,15 +73,12 @@ const loginSlice = createSlice({
         }
       });
     },
-    addTokenStorage: (state, { payload }: PayloadAction<{ code: number, user: User }>) => {
-      if (payload.code === 1) {
-        const entries = Object.entries(payload.user);
-        entries.forEach(([key, value]) => { state[key] = value; });
-        state.error = null;
-      }
-    },
     changeEmailActivation: (state, { payload }) => {
       state.email = payload;
+    },
+    changeUserData: (state, { payload }: PayloadAction<{ [key: string]: string }>) => {
+      const entries = Object.entries(payload);
+      entries.forEach(([key, value]) => { state[key] = value; });
     },
   },
   extraReducers: (builder) => {
@@ -158,6 +155,6 @@ const loginSlice = createSlice({
   },
 });
 
-export const { removeToken, addTokenStorage, changeEmailActivation } = loginSlice.actions;
+export const { removeToken, changeEmailActivation, changeUserData } = loginSlice.actions;
 
 export default loginSlice.reducer;

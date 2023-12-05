@@ -1,11 +1,15 @@
 import bcrypt from 'bcryptjs';
-import e, { Request, Response } from 'express';
+import { Response } from 'express';
 import { Op } from 'sequelize';
 import { codeGen } from '../activation/Activation.js';
-import { sendMailChangeEmail } from '../mail/sendMail';
+import { sendMailChangeEmail } from '../mail/sendMail.js';
 import Users, { PassportRequest } from '../db/tables/Users.js';
 
-type ConfirmEmailValues = { code?: number, email?: string };
+type ConfirmEmailValues = {
+  code?: number;
+  email?: string;
+  phone?: string;
+};
 
 type ChangeDataValues = {
   username?: string;
@@ -19,26 +23,33 @@ class Profile {
 
   async confirmEmail(req: PassportRequest, res: Response) {
     try {
-      const { dataValues: { id, username } } = req.user;
+      const { dataValues: { id, username, change_email_code } } = req.user;
       const values: ConfirmEmailValues = req.body;
-      const user = await Users.findOne({ where: { id } });
-      if (values.code) {
-        if (Number(values.code) === user.change_email_code) {
+      const { email, code, phone } = values;
+      if (code) {
+        if (Number(code) === change_email_code) {
           await Users.update({ change_email_code: null }, { where: { id } });
           return res.send({ code: 1 });
         }
         return res.send({ code: 2 });
       }
-      if (values.email) {
-        const users = await Users.findAll({
-          attributes: ['email'],
-        });
-        if (users.find((user) => user.email === values.email)) {
-          return res.send({ code: 3 });
+      if (email) {
+        const users = await Users.findAll({ where: { [Op.or]: [{ email: email || '' }, { phone: phone || '' }] } });
+        if (users.length > 0) {
+          const errorsFields = users.reduce((acc: ('email' | 'phone')[], user) => {
+            if (user.email === email) {
+              acc.push('email');
+            }
+            if (user.phone === phone) {
+              acc.push('phone');
+            }
+            return acc;
+          }, []);
+          return res.json({ code: 3, errorsFields }); // есть существующие пользователи
         }
         const code = codeGen();
         await Users.update({ change_email_code: code }, { where: { id } });
-        await sendMailChangeEmail(username, values.email, code);
+        await sendMailChangeEmail(username, email, code);
         return res.json({ code: 4 });
       }
     } catch (e) {
@@ -49,28 +60,45 @@ class Profile {
 
   async changeData(req: PassportRequest, res: Response) {
     try {
-      const { dataValues: { id, phone } } = req.user;
+      const { dataValues: { id, password } } = req.user;
       const values: ChangeDataValues = req.body;
-      const user = await Users.findOne({ where: { id } });
-      if (values.code) {
-        if (Number(values.code) === user.change_email_code) {
-          await Users.update({ change_email_code: null }, { where: { id } });
-          return res.send({ code: 1 });
+      const { email, phone, oldPassword } = values;
+      if (values.password) {
+        const isValidPassword = bcrypt.compareSync(oldPassword, password);
+        if (!isValidPassword) {
+          return res.json({ code: 3 }); // старый пароль не совпадает
         }
-        return res.send({ code: 2 });
       }
-      if (values.email) {
-        const users = await Users.findAll({
-          attributes: ['email'],
-        });
-        if (users.find((user) => user.email === values.email)) {
-          return res.send({ code: 3 });
+      if (email || phone) {
+        const users = await Users.findAll({ where: { [Op.or]: [{ email: email || '' }, { phone: phone || '' }] } });
+        if (users.length > 0) {
+          const errorsFields = users.reduce((acc: ('email' | 'phone')[], user) => {
+            if (user.email === email) {
+              acc.push('email');
+            }
+            if (user.phone === phone) {
+              acc.push('phone');
+            }
+            return acc;
+          }, []);
+          return res.json({ code: 2, errorsFields }); // есть существующие пользователи
         }
-        const code = codeGen();
-        await Users.update({ change_email_code: code }, { where: { id } });
-        await sendMailChangeEmail(username, values.email, code);
-        return res.json({ code: 4 });
       }
+      const initialObject: ChangeDataValues = {};
+      // пересобираем объект с данными для дальнейшего обновления
+      const newDataValues = Object.entries(values).reduce((acc, [key, value]) => {
+        if (key === 'oldPassword') {
+          return acc;
+        }
+        if (key === 'password') {
+          const hashPassword = bcrypt.hashSync(value, 10);
+          return { ...acc, password: hashPassword };
+        }
+        return { ...acc, [key]: value };
+      }, initialObject);
+
+      await Users.update(newDataValues, { where: { id } });
+      res.json({ code: 1, newDataValues });
     } catch (e) {
       console.log(e);
       res.sendStatus(500);

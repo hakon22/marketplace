@@ -1,11 +1,13 @@
-import { Form, Button } from 'react-bootstrap';
+import { Form, Button, Spinner } from 'react-bootstrap';
 import { useState, useEffect, useContext } from 'react';
 import InputMask from 'react-input-mask';
 import { useTranslation } from 'react-i18next';
 import { useFormik } from 'formik';
+import { Spin } from 'antd';
 import { isEmpty, toLower, capitalize } from 'lodash';
 import axios from 'axios';
 import { useAppDispatch } from '../../utilities/hooks';
+import { changeUserData } from '../../slices/loginSlice';
 import type { InitialStateType } from '../../types/InitialState';
 import { profileValidation } from '../../validations/validations';
 import { ModalContext } from '../Context';
@@ -15,6 +17,13 @@ import notify from '../../utilities/toast';
 import routes from '../../routes';
 
 type FormikValues = { [key: string]: string | undefined };
+
+type ChangeDataParams = (
+  values: FormikValues,
+  setSubmitting: (value: boolean) => void,
+  setFieldValue: (field: string, value: string) => void,
+  setFieldError: (field: string, value: string) => void,
+) => Promise<void>;
 
 const ProfileForm = ({ user }: { user: InitialStateType }) => {
   const { t } = useTranslation();
@@ -29,6 +38,36 @@ const ProfileForm = ({ user }: { user: InitialStateType }) => {
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [changedData, setChangedData] = useState<FormikValues>({});
 
+  const changeData: ChangeDataParams = async (
+    values,
+    setSubmitting,
+    setFieldValue,
+    setFieldError,
+  ) => {
+    const { data } = await axios.post(routes.changeData, values, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (data.code === 1) {
+      dispatch(changeUserData(data.newDataValues));
+      setIsChange(false);
+      if (values.password) {
+        setFieldValue('password', '');
+        setFieldValue('confirmPassword', '');
+        setFieldValue('oldPassword', '');
+      }
+      notify(t('toast.changeDataSuccess'), 'success');
+    } else if (data.code === 2) {
+      setSubmitting(false);
+      data.errorsFields.forEach((field: 'email' | 'phone') => {
+        setFieldError(field, t('validation.userAlreadyExists'));
+      });
+    } else if (data.code === 3) {
+      setSubmitting(false);
+      setFieldError('oldPassword', t('validation.incorrectPassword'));
+    }
+    setIsConfirmed(false);
+  };
+
   const initialValues: FormikValues = {
     username,
     email,
@@ -41,49 +80,41 @@ const ProfileForm = ({ user }: { user: InitialStateType }) => {
   const formik = useFormik({
     initialValues,
     validationSchema: profileValidation,
-    onSubmit: async (values, { setFieldError, setSubmitting }) => {
+    onSubmit: async (values, { setFieldError, setSubmitting, setFieldValue }) => {
       try {
         const initialObject: FormikValues = {};
+        // получаем изменённые данные
         const changedValues = Object.keys(values).reduce((acc, key) => {
           if (initialValues[key] === values[key] || key === 'confirmPassword') {
             return acc;
           }
           return { ...acc, [key]: values[key] };
         }, initialObject);
-        if (isEmpty(changedValues)) {
+        if (isEmpty(changedValues)) { // если ничего не изменилось, отменяем изменение
           setIsChange(false);
-        } else if (changedValues.email) {
-          changedValues.email = toLower(changedValues.email);
-          const { data } = await axios.post(routes.confirmEmail, { email: changedValues.email }, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          if (data.code === 3) {
-            setSubmitting(false);
-            setFieldError('username', t('validation.userAlreadyExists'));
-          } else if (data.code === 4) {
-            if (changedValues.username) {
-              changedValues.username = capitalize(changedValues.username);
-            }
-            setChangedData(changedValues);
-            modalShow('confirmEmail');
-          }
         } else {
           if (changedValues.username) {
             changedValues.username = capitalize(changedValues.username);
+            setFieldValue('username', changedValues.username);
           }
-          const { data } = await axios.post(routes.changeData, changedValues, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          if (data.code === 1) {
-            notify(t('toast.changeDataSuccess'), 'success');
-          } else if (data.code === 2) {
-            setSubmitting(false);
-            data.errorsFields.forEach((field: 'email' | 'phone') => {
-              setFieldError(field, t('validation.userAlreadyExists'));
+          if (changedValues.email) { // если изменялась почта, отсылаем письмо для проверки
+            changedValues.email = toLower(changedValues.email);
+            setFieldValue('email', changedValues.email);
+            const sendObject = { email: changedValues.email, phone: changedValues.phone };
+            const { data } = await axios.post(routes.confirmEmail, sendObject, {
+              headers: { Authorization: `Bearer ${token}` },
             });
-          } else if (data.code === 3) {
-            setSubmitting(false);
-            setFieldError('password', t('validation.incorrectPassword'));
+            if (data.code === 3) { // такой пользователь уже существует
+              setSubmitting(false);
+              data.errorsFields.forEach((field: 'email' | 'phone') => {
+                setFieldError(field, t('validation.userAlreadyExists'));
+              });
+            } else if (data.code === 4) { // письмо отправлено, ожидаем проверки
+              setChangedData(changedValues);
+              modalShow('confirmEmail');
+            }
+          } else { // если почта не изменялась, просто меняем данные
+            await changeData(changedValues, setSubmitting, setFieldValue, setFieldError);
           }
         }
       } catch (e) {
@@ -92,20 +123,6 @@ const ProfileForm = ({ user }: { user: InitialStateType }) => {
       }
     },
   });
-
-  function changeData () {
-    const { data } = await axios.post(routes.changeData, changedValues, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (data.code === 1) {
-      notify(t('toast.changeDataSuccess'), 'success');
-    } else if (data.code === 2) {
-      setSubmitting(false);
-      data.errorsFields.forEach((field: 'email' | 'phone') => {
-        setFieldError(field, t('validation.userAlreadyExists'));
-      });
-    }
-  }
 
   const cancelChange = () => {
     if (!isConfirmed) {
@@ -117,13 +134,15 @@ const ProfileForm = ({ user }: { user: InitialStateType }) => {
 
   useEffect(() => {
     if (isConfirmed) {
-
+      modalClose();
+      changeData(changedData, formik.setSubmitting, formik.setFieldValue, formik.setFieldError);
     }
   }, [isConfirmed]);
 
   return (
     <>
       <ModalConfirmEmail show={show} onHide={cancelChange} setIsConfirmed={setIsConfirmed} />
+      <Spin spinning={isConfirmed} tip="Сохранение..." size="large" fullscreen />
       <div className="d-flex justify-content-between">
         <Form onSubmit={formik.handleSubmit} className="col-12 col-md-5">
           <Form.Group className={formClass('username', 'mb-3 d-flex align-items-center gap-2', formik)}>
@@ -250,13 +269,24 @@ const ProfileForm = ({ user }: { user: InitialStateType }) => {
             {!isChange && <Button variant="warning" onClick={() => setIsChange(true)}>Изменить данные</Button>}
             {isChange && (
             <>
-              <Button variant="success" type="submit">Сохранить</Button>
+              <Button variant="success" type="submit" disabled={formik.isSubmitting}>
+                {formik.isSubmitting ? (
+                  <Spinner
+                    as="span"
+                    animation="border"
+                    size="sm"
+                    role="status"
+                    aria-hidden="true"
+                  />
+                ) : 'Сохранить'}
+              </Button>
               <Button
                 variant="danger"
                 onClick={() => {
                   formik.resetForm();
                   setIsChange(false);
                 }}
+                disabled={formik.isSubmitting}
               >
                 Отмена
               </Button>

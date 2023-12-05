@@ -518,14 +518,14 @@ export const ModalConfirmEmail = ({ onHide, show, setIsConfirmed }: ModalConfirm
     initialValues: {
       code: '',
     },
-    onSubmit: async (value, { setSubmitting, setFieldError }) => {
+    onSubmit: async (value, { setSubmitting, setFieldError, resetForm }) => {
       try {
         const { data } = await axios.post(routes.confirmEmail, value, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (data.code === 1) {
           setIsConfirmed(true);
-          onHide();
+          resetForm();
         } else if (data.code === 2) {
           setSubmitting(false);
           setFieldError('code', t('validation.incorrectCode'));
