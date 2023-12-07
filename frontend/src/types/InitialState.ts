@@ -1,3 +1,5 @@
+import type { Addresses } from '../../../backend/src/types/Addresses';
+
 export type LoadingStatus = 'idle' | 'loading' | 'finish' | 'failed';
 
 export type InitialStateType = {
@@ -10,5 +12,7 @@ export type InitialStateType = {
   username?: string;
   phone?: string;
   role?: string;
-  [key: string]: string | number | null | undefined;
+  addresses?: Addresses,
+  orders?: number[],
+  [key: string]: Addresses | number[] | string | number | null | undefined;
 }

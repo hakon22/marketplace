@@ -1,16 +1,7 @@
 import { DataTypes, Model, InferAttributes, InferCreationAttributes, CreationOptional } from 'sequelize';
 import { Request } from 'express';
 import { db } from '../connect.js';
-
-type Address = {
-  city: string;
-  street: string;
-  house: number;
-  building?: number;
-  floor?: number;
-  frontDoor?: number;
-  apartment?: number;
-};
+import type { Addresses } from '../../types/Addresses';
 
 interface UserModel extends Model<InferAttributes<UserModel>, InferCreationAttributes<UserModel>> {
   id?: CreationOptional<number>;
@@ -22,7 +13,7 @@ interface UserModel extends Model<InferAttributes<UserModel>, InferCreationAttri
   refresh_token: string[];
   code_activation: number;
   change_email_code: number;
-  addresses: Address[];
+  addresses: Addresses;
   orders: number[];
   createdAt?: string;
   updatedAt?: string;
@@ -69,11 +60,13 @@ const Users = db.define<UserModel>(
     },
     change_email_code: {
       type: DataTypes.INTEGER,
-      defaultValue: null,
     },
     addresses: {
-      type: DataTypes.ARRAY(DataTypes.JSONB),
-      defaultValue: [],
+      type: DataTypes.JSON,
+      defaultValue: {
+        addressList: [],
+        currentAddress: -1,
+      },
     },
     orders: {
       type: DataTypes.ARRAY(DataTypes.INTEGER),

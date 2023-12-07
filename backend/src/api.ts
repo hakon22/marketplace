@@ -9,6 +9,8 @@ const router = express.Router();
 
 const apiPath = '/marketplace/api';
 
+const jwtToken = passport.authenticate('jwt', { session: false });
+
 router.post(`${apiPath}/auth/signup`, Auth.signup);
 router.post(`${apiPath}/auth/login`, Auth.login);
 router.post(`${apiPath}/auth/recoveryPassword`, Auth.recoveryPassword);
@@ -22,11 +24,15 @@ router.get(`${apiPath}/activation/repeatEmail/:id`, Activation.repeatEmail);
 router.post(`${apiPath}/activation/changeEmail`, Activation.changeEmail);
 
 router.get(`${apiPath}/market/getAll`, Market.getAll);
-router.post(`${apiPath}/market/upload`, passport.authenticate('jwt', { session: false }), Market.upload);
-router.post(`${apiPath}/market/edit`, passport.authenticate('jwt', { session: false }), Market.edit);
-router.delete(`${apiPath}/market/remove`, passport.authenticate('jwt', { session: false }), Market.remove);
+router.post(`${apiPath}/market/upload`, jwtToken, Market.upload);
+router.post(`${apiPath}/market/edit`, jwtToken, Market.edit);
+router.delete(`${apiPath}/market/remove`, jwtToken, Market.remove);
 
-router.post(`${apiPath}/profile/confirmEmail`, passport.authenticate('jwt', { session: false }), Profile.confirmEmail);
-router.post(`${apiPath}/profile/changeData`, passport.authenticate('jwt', { session: false }), Profile.changeData);
+router.post(`${apiPath}/profile/confirmEmail`, jwtToken, Profile.confirmEmail);
+router.post(`${apiPath}/profile/changeData`, jwtToken, Profile.changeData);
+router.post(`${apiPath}/profile/addAddress`, jwtToken, Profile.addAddress);
+router.patch(`${apiPath}/profile/removeAddress`, jwtToken, Profile.removeAddress);
+router.patch(`${apiPath}/profile/updateAddress`, jwtToken, Profile.updateAddress);
+router.patch(`${apiPath}/profile/selectAddress`, jwtToken, Profile.selectAddress);
 
 export default router;

@@ -5,12 +5,6 @@ import { codeGen } from '../activation/Activation.js';
 import { sendMailChangeEmail } from '../mail/sendMail.js';
 import Users, { PassportRequest } from '../db/tables/Users.js';
 
-type ConfirmEmailValues = {
-  code?: number;
-  email?: string;
-  phone?: string;
-};
-
 type ChangeDataValues = {
   username?: string;
   email?: string;
@@ -19,13 +13,17 @@ type ChangeDataValues = {
   oldPassword?: string;
 };
 
+type ConfirmEmailValues = {
+  code?: number;
+} & ChangeDataValues;
+
 class Profile {
 
   async confirmEmail(req: PassportRequest, res: Response) {
     try {
-      const { dataValues: { id, username, change_email_code } } = req.user;
+      const { dataValues: { id, username, password, change_email_code } } = req.user;
       const values: ConfirmEmailValues = req.body;
-      const { email, code, phone } = values;
+      const { email, code, phone, oldPassword } = values;
       if (code) {
         if (Number(code) === change_email_code) {
           await Users.update({ change_email_code: null }, { where: { id } });
@@ -34,6 +32,12 @@ class Profile {
         return res.send({ code: 2 });
       }
       if (email) {
+        if (oldPassword) {
+          const isValidPassword = bcrypt.compareSync(oldPassword, password);
+          if (!isValidPassword) {
+            return res.json({ code: 3 }); // старый пароль не совпадает
+          }
+        }
         const users = await Users.findAll({ where: { [Op.or]: [{ email: email || '' }, { phone: phone || '' }] } });
         if (users.length > 0) {
           const errorsFields = users.reduce((acc: ('email' | 'phone')[], user) => {
@@ -45,12 +49,12 @@ class Profile {
             }
             return acc;
           }, []);
-          return res.json({ code: 3, errorsFields }); // есть существующие пользователи
+          return res.json({ code: 4, errorsFields }); // есть существующие пользователи
         }
         const code = codeGen();
         await Users.update({ change_email_code: code }, { where: { id } });
         await sendMailChangeEmail(username, email, code);
-        return res.json({ code: 4 });
+        return res.json({ code: 5 });
       }
     } catch (e) {
       console.log(e);
@@ -99,6 +103,67 @@ class Profile {
 
       await Users.update(newDataValues, { where: { id } });
       res.json({ code: 1, newDataValues });
+    } catch (e) {
+      console.log(e);
+      res.sendStatus(500);
+    }
+  }
+
+  async addAddress(req: PassportRequest, res: Response) {
+    try {
+      const { dataValues: { id, addresses } } = req.user;
+      const currentAddress = addresses.addressList.push(req.body);
+      addresses.currentAddress = currentAddress;
+      await Users.update({ addresses }, { where: { id } });
+      res.json({ code: 1 });
+    } catch (e) {
+      console.log(e);
+      res.sendStatus(500);
+    }
+  }
+
+  async removeAddress(req: PassportRequest, res: Response) {
+    try {
+      const { dataValues: { id, addresses } } = req.user;
+      const { index } = req.body;
+      addresses.addressList = addresses.addressList.filter((address, idx) => idx !== index);
+      if (addresses.currentAddress === (index + 1)) {
+        addresses.currentAddress = addresses.addressList.length;
+      }
+      await Users.update({ addresses }, { where: { id } });
+      res.json({ code: 1, addresses });
+    } catch (e) {
+      console.log(e);
+      res.sendStatus(500);
+    }
+  }
+
+  async updateAddress(req: PassportRequest, res: Response) {
+    try {
+      const { dataValues: { id, addresses } } = req.user;
+      const { oldObject, newObject } = req.body;
+      const addressList = addresses.addressList.map((address) => {
+        if (JSON.stringify(address) === JSON.stringify(oldObject)) {
+          return { ...address, ...newObject };
+        }
+        return address;
+      });
+      const currentAddress = addressList.length;
+      await Users.update({ addresses: { addressList, currentAddress } }, { where: { id } });
+      res.json({ code: 1 });
+    } catch (e) {
+      console.log(e);
+      res.sendStatus(500);
+    }
+  }
+
+  async selectAddress(req: PassportRequest, res: Response) {
+    try {
+      const { dataValues: { id, addresses } } = req.user;
+      const { index } = req.body;
+      addresses.currentAddress = index;
+      await Users.update({ addresses }, { where: { id } });
+      res.json({ code: 1, currentAddress: index });
     } catch (e) {
       console.log(e);
       res.sendStatus(500);

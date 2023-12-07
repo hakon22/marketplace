@@ -9,6 +9,10 @@ body {
   animation-fill-mode: forwards;
 }
 
+.cursor-pointer {
+  cursor: pointer;
+}
+
 .fs-7 {
   font-size: 0.8em;
 }
@@ -40,6 +44,10 @@ body {
   &:hover {
     color: inherit;
   }
+}
+
+.ant-table-row, .ant-table-tbody > tr.ant-table-placeholder {
+  background-color: #fffbf6 !important;
 }
 
 .ant-slider-handle-1 {

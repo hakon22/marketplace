@@ -1,6 +1,24 @@
 import nodemailer from 'nodemailer';
 import { upperCase, lowerCase } from '../utilities/textTransform.js';
-import type { ActivationAccount, RecoveryPassword, ChangeEmail } from 'src/utilities/types/Mail.js';
+
+type RecoveryPassword = (
+  username: string,
+  email: string,
+  password: string,
+) => Promise<void>;
+
+type ChangeEmail = (
+  username: string,
+  email: string,
+  code: number,
+) => Promise<void>;
+
+type ActivationAccount = (
+  id: number,
+  username: string,
+  email: string,
+  code: number,
+) => Promise<void>;
 
 const protocol = 'https://';
 const siteName = 'portfolio.am-projects.ru/marketplace';

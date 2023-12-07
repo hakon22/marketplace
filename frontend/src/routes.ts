@@ -40,4 +40,8 @@ export default {
   editItem: [apiPath, 'market', 'edit'].join('/'),
   confirmEmail: [apiPath, 'profile', 'confirmEmail'].join('/'),
   changeData: [apiPath, 'profile', 'changeData'].join('/'),
+  addAddress: [apiPath, 'profile', 'addAddress'].join('/'),
+  removeAddress: [apiPath, 'profile', 'removeAddress'].join('/'),
+  updateAddress: [apiPath, 'profile', 'updateAddress'].join('/'),
+  selectAddress: [apiPath, 'profile', 'selectAddress'].join('/'),
 } as ApiUrl;

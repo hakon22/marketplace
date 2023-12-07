@@ -213,3 +213,38 @@ export const profileValidation = yup.object().shape({
   ['confirmPassword', 'confirmPassword'],
   ['oldPassword', 'oldPassword'],
 ]);
+
+export const addressValidation = yup.object().shape({
+  city: yup
+    .string()
+    .trim()
+    .required()
+    .min(3)
+    .max(20),
+  street: yup
+    .string()
+    .trim()
+    .required(),
+  house: yup
+    .string()
+    .trim()
+    .required(),
+  building: yup
+    .string()
+    .trim(),
+  floor: yup
+    .string()
+    .trim(),
+  intercom: yup
+    .string()
+    .trim(),
+  frontDoor: yup
+    .string()
+    .trim(),
+  apartment: yup
+    .string()
+    .trim(),
+  comment: yup
+    .string()
+    .trim(),
+});
