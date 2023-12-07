@@ -16,7 +16,7 @@ const Breadcrumb = () => {
 
   const [breadcrumbs, setBreadcrumbs] = useState<BreadcrumbState[]>([]);
 
-  const helmet = breadcrumbs.at(-1)?.helmet;
+  const helmet = breadcrumbs[breadcrumbs.length - 1]?.helmet;
 
   useEffect(() => {
     const pathArray = pathname.slice(1).split('/');
