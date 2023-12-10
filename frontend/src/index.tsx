@@ -1,7 +1,17 @@
-import ReactDOM from 'react-dom/client';
+import { hydrateRoot, createRoot } from 'react-dom/client';
+import crawlerUserAgents from './crawlerUserAgents';
 import './scss/app.scss';
 import init from './init';
 
-const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
+const app = async () => {
+  const container = document.getElementById('root') as HTMLElement;
 
-root.render(await init());
+  if (container.hasChildNodes() && crawlerUserAgents.includes(window.navigator.userAgent)) {
+    hydrateRoot(container, await init());
+  } else {
+    const root = createRoot(container);
+    root.render(await init());
+  }
+};
+
+app();

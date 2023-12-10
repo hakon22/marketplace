@@ -31,7 +31,7 @@ const Pagination = ({
     const pageIndex = page - 1;
     const firstIndex = pageIndex * rowsPerPage;
     const lastIndex = pageIndex * rowsPerPage + rowsPerPage;
-    setShowData(data.slice(firstIndex, lastIndex));
+    setShowData(data.slice(firstIndex, navigator.userAgent === 'ReactSnap' ? -1 : lastIndex));
     if (urlSearch) {
       navigate(`?q=${urlSearch}&page=${page}`);
     } else {
