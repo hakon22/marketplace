@@ -1,4 +1,4 @@
-const apiPath = navigator.userAgent === 'ReactSnap' ? 'http://0.0.0.0:3007/marketplace/api' : '/marketplace/api';
+const apiPath = '/marketplace/api';
 
 interface ApiUrl {
   [key: string]: string;
